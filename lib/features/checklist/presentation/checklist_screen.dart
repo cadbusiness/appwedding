@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/empty_state.dart';
-import '../../wedding/data/wedding_providers.dart';
 
 // Simple local checklist items - can be extended to Supabase later
 final _defaultCategories = [

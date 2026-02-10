@@ -15,8 +15,6 @@ class _BudgetItem {
     required this.category,
     required this.label,
     required this.estimated,
-    this.actual = 0,
-    this.paid = false,
   });
 }
 
@@ -28,7 +26,7 @@ class BudgetScreen extends ConsumerStatefulWidget {
 }
 
 class _BudgetScreenState extends ConsumerState<BudgetScreen> {
-  double _totalBudget = 25000;
+  final double _totalBudget = 25000;
   final _currencyFormat = NumberFormat.currency(locale: 'fr_FR', symbol: '€');
 
   final List<_BudgetItem> _items = [

@@ -72,9 +72,7 @@ class _WeddingDashboard extends StatelessWidget {
     final weddingDate = wedding['date'] != null
         ? DateTime.tryParse(wedding['date'])
         : null;
-    final daysLeft = weddingDate != null
-        ? weddingDate.difference(DateTime.now()).inDays
-        : null;
+    final daysLeft = weddingDate?.difference(DateTime.now()).inDays;
     final dateFormatted = weddingDate != null
         ? DateFormat('d MMMM yyyy', 'fr_FR').format(weddingDate)
         : 'Date non définie';
