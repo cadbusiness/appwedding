@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../core/config/app_constants.dart';
+
 import '../../../../core/theme/app_theme.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -20,7 +20,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _passwordController = TextEditingController();
   bool _loading = false;
   bool _obscurePassword = true;
-  String _selectedRole = AppRoles.selfPlanner;
+  String _selectedRole = 'self_planner';
 
   @override
   void dispose() {
@@ -130,9 +130,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         child: _RoleTab(
                           icon: Icons.favorite_rounded,
                           label: 'Couple',
-                          selected: _selectedRole == AppRoles.selfPlanner,
+                          selected: _selectedRole == 'self_planner',
                           onTap: () => setState(
-                              () => _selectedRole = AppRoles.selfPlanner),
+                              () => _selectedRole = 'self_planner'),
                         ),
                       ),
                       Expanded(
@@ -140,9 +140,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           icon: Icons.business_center_rounded,
                           label: 'Professionnel',
                           selected:
-                              _selectedRole == AppRoles.weddingPlanner,
+                              _selectedRole == 'wedding_planner',
                           onTap: () => setState(
-                              () => _selectedRole = AppRoles.weddingPlanner),
+                              () => _selectedRole = 'wedding_planner'),
                         ),
                       ),
                     ],

@@ -8,8 +8,8 @@ class _BudgetItem {
   final String category;
   final String label;
   final double estimated;
-  double actual;
-  bool paid;
+  double actual = 0;
+  bool paid = false;
 
   _BudgetItem({
     required this.category,
