@@ -54,23 +54,13 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
 
       final supabase = Supabase.instance.client;
 
-      // Insert wedding with correct DB column names
-      // weddings table: id, planner_id, title, wedding_date, venue, budget, status, mode
-      final wedding = await supabase.from('weddings').insert({
-        'title': _titleController.text.trim(),
-        'wedding_date': _date!.toIso8601String().split('T').first,
-        'venue': _venue.text.trim().isEmpty ? null : _venue.text.trim(),
-        'budget': _budget,
-        'status': 'planning',
-        'mode': 'self',
-      }).select().single();
-
-      // Link user to wedding via wedding_clients
-      // wedding_clients table: id, wedding_id, user_id, is_primary
-      await supabase.from('wedding_clients').insert({
-        'wedding_id': wedding['id'],
-        'user_id': user.id,
-        'is_primary': true,
+      // Use RPC to create wedding + link in one transaction
+      // This avoids the RLS SELECT problem after INSERT
+      final result = await supabase.rpc('create_self_wedding', params: {
+        'p_title': _titleController.text.trim(),
+        'p_wedding_date': _date!.toIso8601String().split('T').first,
+        'p_venue': _venue.text.trim().isEmpty ? null : _venue.text.trim(),
+        'p_budget': _budget,
       });
 
       ref.invalidate(weddingProvider);
@@ -107,8 +97,6 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 24),
-
-              // Wedding title
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
@@ -119,8 +107,6 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
                 validator: (v) => v == null || v.isEmpty ? 'Requis' : null,
               ),
               const SizedBox(height: 16),
-
-              // Date picker
               GestureDetector(
                 onTap: _pickDate,
                 child: Container(
@@ -128,7 +114,7 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
                   decoration: BoxDecoration(
                     color: Colors.grey.shade50,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200),
+                    border: Border.all(color: _date == null ? Colors.red.shade200 : Colors.grey.shade200),
                   ),
                   child: Row(
                     children: [
@@ -137,7 +123,7 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
                       Text(
                         _date != null
                             ? DateFormat('d MMMM yyyy', 'fr_FR').format(_date!)
-                            : 'Choisir la date',
+                            : 'Choisir la date *',
                         style: TextStyle(
                           fontSize: 15,
                           color: _date != null ? Colors.black87 : Colors.grey,
@@ -148,8 +134,6 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Venue
               TextFormField(
                 controller: _venue,
                 decoration: const InputDecoration(
@@ -158,8 +142,6 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Budget slider
               Text(
                 'Budget estimé',
                 style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey.shade700),
@@ -187,16 +169,13 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
                 onChanged: (v) => setState(() => _budget = v.roundToDouble()),
               ),
               const SizedBox(height: 32),
-
-              // Create button
               SizedBox(
                 height: 52,
                 child: ElevatedButton(
                   onPressed: _loading ? null : _create,
                   child: _loading
                       ? const SizedBox(
-                          width: 20,
-                          height: 20,
+                          width: 20, height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
                       : const Text('Créer mon mariage 🎉'),
