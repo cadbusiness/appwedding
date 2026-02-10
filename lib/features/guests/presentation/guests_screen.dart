@@ -30,31 +30,33 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
     super.dispose();
   }
 
+  // Helper to get display name from first_name + last_name
+  String _guestName(Map<String, dynamic> g) {
+    final first = g['first_name'] ?? '';
+    final last = g['last_name'] ?? '';
+    final name = '$first $last'.trim();
+    return name.isEmpty ? 'Sans nom' : name;
+  }
+
   List<Map<String, dynamic>> _filterGuests(
       List<Map<String, dynamic>> guests, int tabIndex) {
     var filtered = guests;
     if (_searchQuery.isNotEmpty) {
       filtered = filtered
-          .where((g) => (g['full_name'] ?? '')
-              .toString()
+          .where((g) => _guestName(g)
               .toLowerCase()
               .contains(_searchQuery.toLowerCase()))
           .toList();
     }
     switch (tabIndex) {
       case 1:
-        return filtered
-            .where((g) => g['rsvp_status'] == 'confirmed')
-            .toList();
+        return filtered.where((g) => g['rsvp_status'] == 'confirmed').toList();
       case 2:
         return filtered
-            .where((g) =>
-                g['rsvp_status'] == 'pending' || g['rsvp_status'] == null)
+            .where((g) => g['rsvp_status'] == 'pending' || g['rsvp_status'] == null)
             .toList();
       case 3:
-        return filtered
-            .where((g) => g['rsvp_status'] == 'declined')
-            .toList();
+        return filtered.where((g) => g['rsvp_status'] == 'declined').toList();
       default:
         return filtered;
     }
@@ -83,7 +85,8 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
   }
 
   void _showAddGuestDialog() {
-    final nameController = TextEditingController();
+    final firstNameController = TextEditingController();
+    final lastNameController = TextEditingController();
     final emailController = TextEditingController();
 
     showModalBottomSheet(
@@ -94,24 +97,28 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
       ),
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(
-          left: 24,
-          right: 24,
-          top: 24,
+          left: 24, right: 24, top: 24,
           bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Ajouter un invité',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-            ),
+            const Text('Ajouter un invité',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 20),
             TextFormField(
-              controller: nameController,
+              controller: firstNameController,
               decoration: const InputDecoration(
-                labelText: 'Nom complet',
+                labelText: 'Prénom',
+                prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: lastNameController,
+              decoration: const InputDecoration(
+                labelText: 'Nom',
                 prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
               ),
             ),
@@ -127,16 +134,14 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
-                if (nameController.text.isEmpty) return;
-                final wedding =
-                    await ref.read(weddingProvider.future);
+                if (firstNameController.text.isEmpty) return;
+                final wedding = await ref.read(weddingProvider.future);
                 if (wedding == null) return;
 
-                await Supabase.instance.client
-                    .from('wedding_guests')
-                    .insert({
+                await Supabase.instance.client.from('wedding_guests').insert({
                   'wedding_id': wedding['id'],
-                  'full_name': nameController.text.trim(),
+                  'first_name': firstNameController.text.trim(),
+                  'last_name': lastNameController.text.trim(),
                   'email': emailController.text.trim().isEmpty
                       ? null
                       : emailController.text.trim(),
@@ -187,7 +192,6 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
       ),
       body: Column(
         children: [
-          // Search bar
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.white,
@@ -206,15 +210,12 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
               ),
             ),
           ),
-          // Guest list
           Expanded(
             child: guestsAsync.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('Erreur: $e')),
               data: (guests) {
-                final filtered =
-                    _filterGuests(guests, _tabController.index);
+                final filtered = _filterGuests(guests, _tabController.index);
                 if (filtered.isEmpty) {
                   return const EmptyState(
                     icon: Icons.people_outline_rounded,
@@ -228,6 +229,7 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
                   separatorBuilder: (_, __) => const SizedBox(height: 8),
                   itemBuilder: (_, i) {
                     final guest = filtered[i];
+                    final name = _guestName(guest);
                     return Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -239,13 +241,9 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
                         children: [
                           CircleAvatar(
                             radius: 20,
-                            backgroundColor:
-                                AppTheme.primary.withOpacity(0.1),
+                            backgroundColor: AppTheme.primary.withOpacity(0.1),
                             child: Text(
-                              (guest['full_name'] ?? '?')
-                                  .toString()
-                                  .substring(0, 1)
-                                  .toUpperCase(),
+                              name.substring(0, 1).toUpperCase(),
                               style: TextStyle(
                                 color: AppTheme.primary,
                                 fontWeight: FontWeight.w600,
@@ -255,44 +253,28 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  guest['full_name'] ?? '',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15,
-                                  ),
-                                ),
+                                Text(name,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w600, fontSize: 15)),
                                 if (guest['email'] != null)
-                                  Text(
-                                    guest['email'],
-                                    style: TextStyle(
-                                      color: Colors.grey.shade500,
-                                      fontSize: 13,
-                                    ),
-                                  ),
+                                  Text(guest['email'],
+                                      style: TextStyle(
+                                          color: Colors.grey.shade500, fontSize: 13)),
                               ],
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: _statusColor(
-                                      guest['rsvp_status'])
-                                  .withOpacity(0.1),
-                              borderRadius:
-                                  BorderRadius.circular(20),
+                              color: _statusColor(guest['rsvp_status']).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               _statusLabel(guest['rsvp_status']),
                               style: TextStyle(
-                                color: _statusColor(
-                                    guest['rsvp_status']),
+                                color: _statusColor(guest['rsvp_status']),
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),

@@ -8,24 +8,14 @@ final weddingProvider = FutureProvider<Map<String, dynamic>?>((ref) async {
 
   final supabase = ref.watch(supabaseProvider);
 
-  // Get wedding through wedding_clients junction
+  // Get wedding through wedding_clients junction table
+  // Column is "user_id" not "client_user_id"
   final clientLinks = await supabase
       .from('wedding_clients')
       .select('wedding_id')
-      .eq('client_user_id', user.id);
+      .eq('user_id', user.id);
 
-  if (clientLinks.isEmpty) {
-    // Also check if user created wedding directly (self planner)
-    final ownWeddings = await supabase
-        .from('weddings')
-        .select()
-        .or('created_by.eq.${user.id}')
-        .order('created_at', ascending: false)
-        .limit(1);
-
-    if (ownWeddings.isNotEmpty) return ownWeddings.first;
-    return null;
-  }
+  if (clientLinks.isEmpty) return null;
 
   final weddingId = clientLinks.first['wedding_id'];
   final wedding = await supabase
@@ -46,7 +36,7 @@ final weddingGuestsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) a
       .from('wedding_guests')
       .select()
       .eq('wedding_id', wedding['id'])
-      .order('full_name');
+      .order('first_name');
 
   return List<Map<String, dynamic>>.from(guests);
 });

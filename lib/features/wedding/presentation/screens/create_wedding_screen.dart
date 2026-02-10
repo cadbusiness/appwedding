@@ -16,86 +16,195 @@ class CreateWeddingScreen extends ConsumerStatefulWidget {
 
 class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _partner1 = TextEditingController();
-  final _partner2 = TextEditingController();
+  final _titleController = TextEditingController();
   final _venue = TextEditingController();
   DateTime? _date;
-  int _guestEstimate = 100;
+  double _budget = 15000;
   bool _loading = false;
 
   @override
-  void dispose() { _partner1.dispose(); _partner2.dispose(); _venue.dispose(); super.dispose(); }
+  void dispose() {
+    _titleController.dispose();
+    _venue.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickDate() async {
-    final d = await showDatePicker(context: context, initialDate: DateTime.now().add(const Duration(days: 180)), firstDate: DateTime.now(), lastDate: DateTime(2032));
+    final d = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().add(const Duration(days: 180)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2032),
+    );
     if (d != null) setState(() => _date = d);
   }
 
   Future<void> _create() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_date == null) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Choisissez une date'))); return; }
+    if (_date == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Choisissez une date')),
+      );
+      return;
+    }
     setState(() => _loading = true);
     try {
       final user = ref.read(currentUserProvider);
       if (user == null) return;
-      final wedding = await Supabase.instance.client.from('weddings').insert({
-        'partner1_name': _partner1.text.trim(),
-        'partner2_name': _partner2.text.trim(),
-        'date': _date!.toIso8601String().split('T').first,
+
+      final supabase = Supabase.instance.client;
+
+      // Insert wedding with correct DB column names
+      // weddings table: id, planner_id, title, wedding_date, venue, budget, status, mode
+      final wedding = await supabase.from('weddings').insert({
+        'title': _titleController.text.trim(),
+        'wedding_date': _date!.toIso8601String().split('T').first,
         'venue': _venue.text.trim().isEmpty ? null : _venue.text.trim(),
-        'estimated_guests': _guestEstimate,
+        'budget': _budget,
         'status': 'planning',
-        'wedding_mode': 'self',
-        'created_by': user.id,
+        'mode': 'self',
       }).select().single();
-      await Supabase.instance.client.from('wedding_clients').insert({'wedding_id': wedding['id'], 'client_user_id': user.id});
+
+      // Link user to wedding via wedding_clients
+      // wedding_clients table: id, wedding_id, user_id, is_primary
+      await supabase.from('wedding_clients').insert({
+        'wedding_id': wedding['id'],
+        'user_id': user.id,
+        'is_primary': true,
+      });
+
       ref.invalidate(weddingProvider);
       if (mounted) context.go('/');
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erreur: $e'), backgroundColor: AppTheme.error));
-    } finally { if (mounted) setState(() => _loading = false); }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur: $e'), backgroundColor: AppTheme.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Créer mon mariage'), backgroundColor: Colors.white, surfaceTintColor: Colors.transparent),
+      appBar: AppBar(
+        title: const Text('Créer mon mariage'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          const Text('Qui se marie ? 💍', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 24),
-          TextFormField(controller: _partner1, decoration: const InputDecoration(labelText: 'Prénom partenaire 1', prefixIcon: Icon(Icons.person_outline_rounded, size: 20)), validator: (v) => v == null || v.isEmpty ? 'Requis' : null),
-          const SizedBox(height: 16),
-          TextFormField(controller: _partner2, decoration: const InputDecoration(labelText: 'Prénom partenaire 2', prefixIcon: Icon(Icons.person_outline_rounded, size: 20)), validator: (v) => v == null || v.isEmpty ? 'Requis' : null),
-          const SizedBox(height: 24),
-          GestureDetector(
-            onTap: _pickDate,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
-              child: Row(children: [
-                Icon(Icons.calendar_month_rounded, color: AppTheme.primary, size: 22),
-                const SizedBox(width: 12),
-                Text(_date != null ? DateFormat('d MMMM yyyy', 'fr_FR').format(_date!) : 'Choisir la date', style: TextStyle(fontSize: 15, color: _date != null ? Colors.black87 : Colors.grey)),
-              ]),
-            ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Votre mariage 💍',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 24),
+
+              // Wedding title
+              TextFormField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Titre du mariage',
+                  hintText: 'ex: Mariage Marie & Pierre',
+                  prefixIcon: Icon(Icons.favorite_outline_rounded, size: 20),
+                ),
+                validator: (v) => v == null || v.isEmpty ? 'Requis' : null,
+              ),
+              const SizedBox(height: 16),
+
+              // Date picker
+              GestureDetector(
+                onTap: _pickDate,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.calendar_month_rounded, color: AppTheme.primary, size: 22),
+                      const SizedBox(width: 12),
+                      Text(
+                        _date != null
+                            ? DateFormat('d MMMM yyyy', 'fr_FR').format(_date!)
+                            : 'Choisir la date',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: _date != null ? Colors.black87 : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Venue
+              TextFormField(
+                controller: _venue,
+                decoration: const InputDecoration(
+                  labelText: 'Lieu (optionnel)',
+                  prefixIcon: Icon(Icons.location_on_outlined, size: 20),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Budget slider
+              Text(
+                'Budget estimé',
+                style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Text(
+                    '${NumberFormat('#,###', 'fr_FR').format(_budget)} €',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              Slider(
+                value: _budget,
+                min: 1000,
+                max: 100000,
+                divisions: 99,
+                activeColor: AppTheme.primary,
+                label: '${NumberFormat('#,###', 'fr_FR').format(_budget)} €',
+                onChanged: (v) => setState(() => _budget = v.roundToDouble()),
+              ),
+              const SizedBox(height: 32),
+
+              // Create button
+              SizedBox(
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: _loading ? null : _create,
+                  child: _loading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Text('Créer mon mariage 🎉'),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          TextFormField(controller: _venue, decoration: const InputDecoration(labelText: 'Lieu (optionnel)', prefixIcon: Icon(Icons.location_on_outlined, size: 20))),
-          const SizedBox(height: 24),
-          Text('Nombre d\'invités estimé', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
-          const SizedBox(height: 8),
-          Row(children: [
-            Text('$_guestEstimate', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: AppTheme.primary)),
-            const SizedBox(width: 4),
-            const Text('invités'),
-          ]),
-          Slider(value: _guestEstimate.toDouble(), min: 10, max: 500, divisions: 49, activeColor: AppTheme.primary, label: '$_guestEstimate', onChanged: (v) => setState(() => _guestEstimate = v.round())),
-          const SizedBox(height: 32),
-          SizedBox(height: 52, child: ElevatedButton(onPressed: _loading ? null : _create, child: _loading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('Créer mon mariage 🎉'))),
-        ])),
+        ),
       ),
     );
   }

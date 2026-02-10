@@ -23,7 +23,24 @@ class DashboardScreen extends ConsumerWidget {
       body: SafeArea(
         child: weddingAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('Erreur: $e')),
+          error: (e, _) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: Colors.red.shade300),
+                  const SizedBox(height: 16),
+                  Text('Erreur: $e', textAlign: TextAlign.center),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => ref.invalidate(weddingProvider),
+                    child: const Text('Réessayer'),
+                  ),
+                ],
+              ),
+            ),
+          ),
           data: (wedding) {
             if (wedding == null) {
               return _NoWeddingView();
@@ -69,10 +86,13 @@ class _WeddingDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final weddingDate = wedding['date'] != null
-        ? DateTime.tryParse(wedding['date'])
+    // DB column is "wedding_date" not "date"
+    final weddingDate = wedding['wedding_date'] != null
+        ? DateTime.tryParse(wedding['wedding_date'].toString())
         : null;
-    final daysLeft = weddingDate?.difference(DateTime.now()).inDays;
+    final daysLeft = weddingDate != null
+        ? weddingDate.difference(DateTime.now()).inDays
+        : null;
     final dateFormatted = weddingDate != null
         ? DateFormat('d MMMM yyyy', 'fr_FR').format(weddingDate)
         : 'Date non définie';
@@ -98,10 +118,7 @@ class _WeddingDashboard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        wedding['partner1_name'] != null &&
-                                wedding['partner2_name'] != null
-                            ? '${wedding['partner1_name']} & ${wedding['partner2_name']}'
-                            : wedding['title'] ?? 'Mon mariage',
+                        wedding['title'] ?? 'Mon mariage',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
@@ -144,15 +161,11 @@ class _WeddingDashboard extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  const Icon(
-                    Icons.favorite_rounded,
-                    color: Colors.white,
-                    size: 32,
-                  ),
+                  const Icon(Icons.favorite_rounded, color: Colors.white, size: 32),
                   const SizedBox(height: 12),
                   if (daysLeft != null) ...[
                     Text(
-                      '$daysLeft',
+                      '${daysLeft > 0 ? daysLeft : 0}',
                       style: const TextStyle(
                         fontSize: 48,
                         fontWeight: FontWeight.w800,
@@ -161,9 +174,9 @@ class _WeddingDashboard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'jours restants',
-                      style: TextStyle(
+                    Text(
+                      daysLeft > 0 ? 'jours restants' : 'Le jour J est arrivé ! 🎉',
+                      style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
                         fontWeight: FontWeight.w500,
@@ -173,10 +186,7 @@ class _WeddingDashboard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     dateFormatted,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.white60,
-                    ),
+                    style: const TextStyle(fontSize: 14, color: Colors.white60),
                   ),
                 ],
               ),
@@ -187,7 +197,7 @@ class _WeddingDashboard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: StatCard(
+                  child: _StatCard(
                     icon: Icons.people_rounded,
                     label: 'Invités',
                     value: '${guestStats['total']}',
@@ -196,7 +206,7 @@ class _WeddingDashboard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: StatCard(
+                  child: _StatCard(
                     icon: Icons.check_circle_rounded,
                     label: 'Confirmés',
                     value: '${guestStats['confirmed']}',
@@ -205,7 +215,7 @@ class _WeddingDashboard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: StatCard(
+                  child: _StatCard(
                     icon: Icons.schedule_rounded,
                     label: 'En attente',
                     value: '${guestStats['pending']}',
@@ -217,10 +227,7 @@ class _WeddingDashboard extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Quick Actions
-            Text(
-              'Outils',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('Outils', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             GridView.count(
               crossAxisCount: 2,
@@ -274,30 +281,17 @@ class _WeddingDashboard extends StatelessWidget {
                         color: AppTheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(
-                        Icons.location_on_rounded,
-                        color: AppTheme.primary,
-                        size: 22,
-                      ),
+                      child: Icon(Icons.location_on_rounded, color: AppTheme.primary, size: 22),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Lieu de réception',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                          ),
+                          const Text('Lieu de réception', style: TextStyle(fontSize: 12, color: Colors.grey)),
                           Text(
                             wedding['venue'],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                            ),
+                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                           ),
                         ],
                       ),
@@ -313,6 +307,35 @@ class _WeddingDashboard extends StatelessWidget {
   }
 }
 
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _StatCard({required this.icon, required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade100),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 22),
+          const SizedBox(height: 6),
+          Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: color)),
+          Text(label, style: TextStyle(fontSize: 11, color: Colors.grey.shade500)),
+        ],
+      ),
+    );
+  }
+}
+
 class _QuickAction extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -320,13 +343,7 @@ class _QuickAction extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
-  const _QuickAction({
-    required this.icon,
-    required this.label,
-    required this.subtitle,
-    required this.color,
-    required this.onTap,
-  });
+  const _QuickAction({required this.icon, required this.label, required this.subtitle, required this.color, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -346,27 +363,12 @@ class _QuickAction extends StatelessWidget {
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
+              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
               child: Icon(icon, color: color, size: 20),
             ),
             const SizedBox(height: 10),
-            Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-              ),
-            ),
-            Text(
-              subtitle,
-              style: TextStyle(
-                color: Colors.grey.shade500,
-                fontSize: 12,
-              ),
-            ),
+            Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+            Text(subtitle, style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
           ],
         ),
       ),
