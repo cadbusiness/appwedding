@@ -10,11 +10,11 @@ class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key, required this.child});
 
   static final _tabs = [
-    const _TabItem(icon: Icons.dashboard_rounded, label: 'Inicio', path: '/'),
-    const _TabItem(icon: Icons.checklist_rounded, label: 'Tareas', path: '/checklist'),
-    const _TabItem(icon: Icons.account_balance_wallet_rounded, label: 'Presupuesto', path: '/budget'),
-    const _TabItem(icon: Icons.people_rounded, label: 'Invitados', path: '/guests'),
-    const _TabItem(icon: Icons.calendar_month_rounded, label: 'Agenda', path: '/timeline'),
+    const _TabItem(icon: Icons.dashboard_rounded, label: 'Accueil', path: '/'),
+    const _TabItem(icon: Icons.checklist_rounded, label: 'Tâches', path: '/checklist'),
+    const _TabItem(icon: Icons.account_balance_wallet_rounded, label: 'Budget', path: '/budget'),
+    const _TabItem(icon: Icons.people_rounded, label: 'Invités', path: '/guests'),
+    const _TabItem(icon: Icons.calendar_month_rounded, label: 'Planning', path: '/timeline'),
   ];
 
   int _currentIndex(BuildContext context) {

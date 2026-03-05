@@ -20,7 +20,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _passwordController = TextEditingController();
   bool _loading = false;
   bool _obscurePassword = true;
-  String _selectedRole = 'self_planner';
 
   @override
   void dispose() {
@@ -44,10 +43,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       );
 
       if (res.user != null) {
-        // Insert user role
+        // Insert user role (B2C app = always self_planner)
         await Supabase.instance.client.from('user_roles').insert({
           'user_id': res.user!.id,
-          'role': _selectedRole,
+          'role': 'self_planner',
         });
 
         // Update profile
@@ -107,38 +106,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 24),
-                // Role selector
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.all(4),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _RoleTab(
-                          icon: Icons.favorite_rounded,
-                          label: 'Couple',
-                          selected: _selectedRole == 'self_planner',
-                          onTap: () => setState(
-                              () => _selectedRole = 'self_planner'),
-                        ),
-                      ),
-                      Expanded(
-                        child: _RoleTab(
-                          icon: Icons.business_center_rounded,
-                          label: 'Professionnel',
-                          selected:
-                              _selectedRole == 'wedding_planner',
-                          onTap: () => setState(
-                              () => _selectedRole = 'wedding_planner'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
                 // Name
                 TextFormField(
                   controller: _nameController,
@@ -251,59 +218,3 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 }
 
-class _RoleTab extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _RoleTab({
-    required this.icon,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: selected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: selected ? AppTheme.primary : Colors.grey,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                color: selected ? AppTheme.primary : Colors.grey,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

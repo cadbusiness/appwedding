@@ -7,39 +7,39 @@ import '../../wedding/data/wedding_providers.dart';
 
 /// Default items seeded on first visit (no local items exist in DB yet).
 const _defaultSeedItems = [
-  {'title': 'Reservar el lugar de la ceremonia', 'category': 'Lugar y Recepción', 'sort_order': 0},
-  {'title': 'Reservar el lugar de la recepción', 'category': 'Lugar y Recepción', 'sort_order': 1},
-  {'title': 'Visitar los lugares potenciales', 'category': 'Lugar y Recepción', 'sort_order': 2},
-  {'title': 'Confirmar los horarios', 'category': 'Lugar y Recepción', 'sort_order': 3},
-  {'title': 'Elegir el banquete', 'category': 'Banquete y Bebidas', 'sort_order': 4},
-  {'title': 'Degustación del menú', 'category': 'Banquete y Bebidas', 'sort_order': 5},
-  {'title': 'Confirmar el menú final', 'category': 'Banquete y Bebidas', 'sort_order': 6},
-  {'title': 'Encargar el pastel', 'category': 'Banquete y Bebidas', 'sort_order': 7},
-  {'title': 'Prueba de vestido/traje', 'category': 'Vestimenta y Belleza', 'sort_order': 8},
-  {'title': 'Elegir los anillos', 'category': 'Vestimenta y Belleza', 'sort_order': 9},
-  {'title': 'Prueba de peinado y maquillaje', 'category': 'Vestimenta y Belleza', 'sort_order': 10},
-  {'title': 'Vestimenta de los padrinos', 'category': 'Vestimenta y Belleza', 'sort_order': 11},
-  {'title': 'Elegir al florista', 'category': 'Decoración y Flores', 'sort_order': 12},
-  {'title': 'Definir el tema de decoración', 'category': 'Decoración y Flores', 'sort_order': 13},
-  {'title': 'Encargar los centros de mesa', 'category': 'Decoración y Flores', 'sort_order': 14},
-  {'title': 'Ramo de la novia', 'category': 'Decoración y Flores', 'sort_order': 15},
-  {'title': 'Reservar DJ/grupo musical', 'category': 'Música y Entretenimiento', 'sort_order': 16},
-  {'title': 'Playlist de la ceremonia', 'category': 'Música y Entretenimiento', 'sort_order': 17},
-  {'title': 'Entretenimiento de la fiesta', 'category': 'Música y Entretenimiento', 'sort_order': 18},
-  {'title': 'Photobooth', 'category': 'Música y Entretenimiento', 'sort_order': 19},
-  {'title': 'Trámites del registro civil', 'category': 'Trámites', 'sort_order': 20},
-  {'title': 'Expediente municipal', 'category': 'Trámites', 'sort_order': 21},
-  {'title': 'Contrato de seguro', 'category': 'Trámites', 'sort_order': 22},
-  {'title': 'Invitaciones enviadas', 'category': 'Trámites', 'sort_order': 23},
+  {'title': 'Réserver le lieu de la cérémonie', 'category': 'Lieu & Réception', 'sort_order': 0},
+  {'title': 'Réserver le lieu de la réception', 'category': 'Lieu & Réception', 'sort_order': 1},
+  {'title': 'Visiter les lieux potentiels', 'category': 'Lieu & Réception', 'sort_order': 2},
+  {'title': 'Confirmer les horaires', 'category': 'Lieu & Réception', 'sort_order': 3},
+  {'title': 'Choisir le traiteur', 'category': 'Traiteur & Boissons', 'sort_order': 4},
+  {'title': 'Dégustation du menu', 'category': 'Traiteur & Boissons', 'sort_order': 5},
+  {'title': 'Confirmer le menu final', 'category': 'Traiteur & Boissons', 'sort_order': 6},
+  {'title': 'Commander le gâteau', 'category': 'Traiteur & Boissons', 'sort_order': 7},
+  {'title': 'Essayage robe/costume', 'category': 'Tenue & Beauté', 'sort_order': 8},
+  {'title': 'Choisir les alliances', 'category': 'Tenue & Beauté', 'sort_order': 9},
+  {'title': 'Essai coiffure et maquillage', 'category': 'Tenue & Beauté', 'sort_order': 10},
+  {'title': 'Tenue des témoins', 'category': 'Tenue & Beauté', 'sort_order': 11},
+  {'title': 'Choisir le fleuriste', 'category': 'Décoration & Fleurs', 'sort_order': 12},
+  {'title': 'Définir le thème de décoration', 'category': 'Décoration & Fleurs', 'sort_order': 13},
+  {'title': 'Commander les centres de table', 'category': 'Décoration & Fleurs', 'sort_order': 14},
+  {'title': 'Bouquet de la mariée', 'category': 'Décoration & Fleurs', 'sort_order': 15},
+  {'title': 'Réserver DJ/groupe musical', 'category': 'Musique & Animation', 'sort_order': 16},
+  {'title': 'Playlist de la cérémonie', 'category': 'Musique & Animation', 'sort_order': 17},
+  {'title': 'Animation de la soirée', 'category': 'Musique & Animation', 'sort_order': 18},
+  {'title': 'Photobooth', 'category': 'Musique & Animation', 'sort_order': 19},
+  {'title': 'Démarches mairie', 'category': 'Démarches', 'sort_order': 20},
+  {'title': 'Dossier de mariage', 'category': 'Démarches', 'sort_order': 21},
+  {'title': 'Contrat d\'assurance', 'category': 'Démarches', 'sort_order': 22},
+  {'title': 'Faire-part envoyés', 'category': 'Démarches', 'sort_order': 23},
 ];
 
 const _categoryIcons = <String, IconData>{
-  'Lugar y Recepción': Icons.location_on_rounded,
-  'Banquete y Bebidas': Icons.restaurant_rounded,
-  'Vestimenta y Belleza': Icons.checkroom_rounded,
-  'Decoración y Flores': Icons.local_florist_rounded,
-  'Música y Entretenimiento': Icons.music_note_rounded,
-  'Trámites': Icons.description_rounded,
+  'Lieu & Réception': Icons.location_on_rounded,
+  'Traiteur & Boissons': Icons.restaurant_rounded,
+  'Tenue & Beauté': Icons.checkroom_rounded,
+  'Décoration & Fleurs': Icons.local_florist_rounded,
+  'Musique & Animation': Icons.music_note_rounded,
+  'Démarches': Icons.description_rounded,
 };
 
 class ChecklistScreen extends ConsumerStatefulWidget {
@@ -107,7 +107,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
           // Group by category
           final categories = <String, List<Map<String, dynamic>>>{};
           for (final item in items) {
-            final cat = (item['category'] ?? 'Otros') as String;
+            final cat = (item['category'] ?? 'Autres') as String;
             categories.putIfAbsent(cat, () => []).add(item);
           }
 
@@ -132,7 +132,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '$doneTasks / $totalTasks tareas',
+                            '$doneTasks / $totalTasks tâches',
                             style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 16,

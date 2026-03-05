@@ -73,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: 24),
               const Text(
-                'Mi Boda',
+                'My Wedding',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 28,
@@ -83,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                'Tu boda, simplificada',
+                'Organisez le plus beau jour de votre vie',
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 16,
