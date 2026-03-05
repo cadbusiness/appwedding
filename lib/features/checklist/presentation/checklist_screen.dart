@@ -5,41 +5,41 @@ import '../../../core/theme/app_theme.dart';
 
 // Simple local checklist items - can be extended to Supabase later
 final _defaultCategories = [
-  _ChecklistCategory('Lieu & Réception', Icons.location_on_rounded, [
-    'Réserver le lieu de cérémonie',
-    'Réserver le lieu de réception',
-    'Visiter les lieux potentiels',
-    'Confirmer les horaires',
+  _ChecklistCategory('Lugar y Recepción', Icons.location_on_rounded, [
+    'Reservar el lugar de la ceremonia',
+    'Reservar el lugar de la recepción',
+    'Visitar los lugares potenciales',
+    'Confirmar los horarios',
   ]),
-  _ChecklistCategory('Traiteur & Boissons', Icons.restaurant_rounded, [
-    'Choisir le traiteur',
-    'Dégustation menu',
-    'Confirmer le menu final',
-    'Commander le gâteau',
+  _ChecklistCategory('Banquete y Bebidas', Icons.restaurant_rounded, [
+    'Elegir el banquete',
+    'Degustación del menú',
+    'Confirmar el menú final',
+    'Encargar el pastel',
   ]),
-  _ChecklistCategory('Tenues & Beauté', Icons.checkroom_rounded, [
-    'Essayage robe/costume',
-    'Choisir les alliances',
-    'Coiffeur & maquillage essai',
-    'Tenues témoins',
+  _ChecklistCategory('Vestimenta y Belleza', Icons.checkroom_rounded, [
+    'Prueba de vestido/traje',
+    'Elegir los anillos',
+    'Prueba de peinado y maquillaje',
+    'Vestimenta de los padrinos',
   ]),
-  _ChecklistCategory('Décoration & Fleurs', Icons.local_florist_rounded, [
-    'Choisir le fleuriste',
-    'Définir le thème déco',
-    'Commander les centres de table',
-    'Bouquet de mariée',
+  _ChecklistCategory('Decoración y Flores', Icons.local_florist_rounded, [
+    'Elegir al florista',
+    'Definir el tema de decoración',
+    'Encargar los centros de mesa',
+    'Ramo de la novia',
   ]),
-  _ChecklistCategory('Musique & Animation', Icons.music_note_rounded, [
-    'Réserver DJ/orchestre',
-    'Playlist cérémonie',
-    'Animations soirée',
+  _ChecklistCategory('Música y Entretenimiento', Icons.music_note_rounded, [
+    'Reservar DJ/grupo musical',
+    'Playlist de la ceremonia',
+    'Entretenimiento de la fiesta',
     'Photobooth',
   ]),
-  _ChecklistCategory('Administratif', Icons.description_rounded, [
-    'Publier les bans',
-    'Dossier mairie',
-    'Contrat assurance',
-    'Faire-part envoyés',
+  _ChecklistCategory('Trámites', Icons.description_rounded, [
+    'Trámites del registro civil',
+    'Expediente municipal',
+    'Contrato de seguro',
+    'Invitaciones enviadas',
   ]),
 ];
 
@@ -63,7 +63,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('Check-list'),
+        title: const Text('Checklist'),
         centerTitle: false,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -89,7 +89,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '$doneTasks / $totalTasks tâches',
+                        '$doneTasks / $totalTasks tareas',
                         style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,

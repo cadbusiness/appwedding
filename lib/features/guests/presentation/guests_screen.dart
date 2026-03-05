@@ -35,7 +35,7 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
     final first = g['first_name'] ?? '';
     final last = g['last_name'] ?? '';
     final name = '$first $last'.trim();
-    return name.isEmpty ? 'Sans nom' : name;
+    return name.isEmpty ? 'Sin nombre' : name;
   }
 
   List<Map<String, dynamic>> _filterGuests(
@@ -76,11 +76,11 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
   String _statusLabel(String? status) {
     switch (status) {
       case 'confirmed':
-        return 'Confirmé';
+        return 'Confirmado';
       case 'declined':
-        return 'Décliné';
+        return 'Declinado';
       default:
-        return 'En attente';
+        return 'Pendiente';
     }
   }
 
@@ -104,13 +104,13 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Ajouter un invité',
+            const Text('Agregar un invitado',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 20),
             TextFormField(
               controller: firstNameController,
               decoration: const InputDecoration(
-                labelText: 'Prénom',
+                labelText: 'Nombre',
                 prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
               ),
             ),
@@ -118,7 +118,7 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
             TextFormField(
               controller: lastNameController,
               decoration: const InputDecoration(
-                labelText: 'Nom',
+                labelText: 'Apellido',
                 prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
               ),
             ),
@@ -127,7 +127,7 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
               controller: emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
-                labelText: 'Email (optionnel)',
+                labelText: 'Correo (opcional)',
                 prefixIcon: Icon(Icons.mail_outline_rounded, size: 20),
               ),
             ),
@@ -151,7 +151,7 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
                 ref.invalidate(weddingGuestsProvider);
                 if (mounted) Navigator.pop(ctx);
               },
-              child: const Text('Ajouter'),
+              child: const Text('Agregar'),
             ),
           ],
         ),
@@ -167,7 +167,7 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('Invités'),
+        title: const Text('Invitados'),
         centerTitle: false,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -178,10 +178,10 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
           unselectedLabelColor: Colors.grey,
           indicatorColor: AppTheme.primary,
           tabs: [
-            Tab(text: 'Tous (${stats['total']})'),
-            Tab(text: 'Oui (${stats['confirmed']})'),
-            Tab(text: 'Attente (${stats['pending']})'),
-            Tab(text: 'Non (${stats['declined']})'),
+            Tab(text: 'Todos (${stats['total']})'),
+            Tab(text: 'Sí (${stats['confirmed']})'),
+            Tab(text: 'Pendiente (${stats['pending']})'),
+            Tab(text: 'No (${stats['declined']})'),
           ],
         ),
       ),
@@ -198,7 +198,7 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
             child: TextField(
               onChanged: (v) => setState(() => _searchQuery = v),
               decoration: InputDecoration(
-                hintText: 'Rechercher un invité...',
+                hintText: 'Buscar un invitado...',
                 prefixIcon: const Icon(Icons.search_rounded, size: 20),
                 filled: true,
                 fillColor: Colors.grey.shade50,
@@ -213,20 +213,20 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
           Expanded(
             child: guestsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Erreur: $e')),
+              error: (e, _) => Center(child: Text('Error: $e')),
               data: (guests) {
                 final filtered = _filterGuests(guests, _tabController.index);
                 if (filtered.isEmpty) {
                   return const EmptyState(
                     icon: Icons.people_outline_rounded,
-                    title: 'Aucun invité',
-                    subtitle: 'Ajoutez vos premiers invités',
+                    title: 'Ningún invitado',
+                    subtitle: 'Agrega a tus primeros invitados',
                   );
                 }
                 return ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: filtered.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
                   itemBuilder: (_, i) {
                     final guest = filtered[i];
                     final name = _guestName(guest);

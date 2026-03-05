@@ -1,6 +1,6 @@
 class AppConstants {
-  static const String appName = 'My Wedding';
-  static const String appTagline = 'Votre mariage, simplifié';
+  static const String appName = 'Mi Boda';
+  static const String appTagline = 'Tu boda, simplificada';
 
   // Roles — same as web
   static const String roleSuperAdmin = 'superadmin';

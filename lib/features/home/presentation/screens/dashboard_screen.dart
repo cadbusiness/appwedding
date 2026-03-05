@@ -31,11 +31,11 @@ class DashboardScreen extends ConsumerWidget {
                 children: [
                   Icon(Icons.error_outline, size: 48, color: Colors.red.shade300),
                   const SizedBox(height: 16),
-                  Text('Erreur: $e', textAlign: TextAlign.center),
+                  Text('Error: $e', textAlign: TextAlign.center),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => ref.invalidate(weddingProvider),
-                    child: const Text('Réessayer'),
+                    child: const Text('Reintentar'),
                   ),
                 ],
               ),
@@ -47,7 +47,7 @@ class DashboardScreen extends ConsumerWidget {
             }
             return _WeddingDashboard(
               wedding: wedding,
-              profileName: profile.value?['full_name'] ?? 'Couple',
+              profileName: profile.value?['full_name'] ?? 'Pareja',
               guestStats: guestStats,
             );
           },
@@ -64,9 +64,9 @@ class _NoWeddingView extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       child: EmptyState(
         icon: Icons.favorite_border_rounded,
-        title: 'Bienvenue !',
-        subtitle: "Créez votre mariage pour commencer l'organisation",
-        actionLabel: 'Créer mon mariage',
+        title: '¡Bienvenido!',
+        subtitle: 'Crea tu boda para comenzar a organizarla',
+        actionLabel: 'Crear mi boda',
         onAction: () => context.push('/wedding/create'),
       ),
     );
@@ -90,12 +90,10 @@ class _WeddingDashboard extends StatelessWidget {
     final weddingDate = wedding['wedding_date'] != null
         ? DateTime.tryParse(wedding['wedding_date'].toString())
         : null;
-    final daysLeft = weddingDate != null
-        ? weddingDate.difference(DateTime.now()).inDays
-        : null;
+    final daysLeft = weddingDate?.difference(DateTime.now()).inDays;
     final dateFormatted = weddingDate != null
-        ? DateFormat('d MMMM yyyy', 'fr_FR').format(weddingDate)
-        : 'Date non définie';
+        ? DateFormat('d MMMM yyyy', 'es_MX').format(weddingDate)
+        : 'Fecha no definida';
 
     return RefreshIndicator(
       onRefresh: () async {},
@@ -113,12 +111,12 @@ class _WeddingDashboard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Bonjour $profileName 💍',
+                        'Hola $profileName 💍',
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        wedding['title'] ?? 'Mon mariage',
+                        wedding['title'] ?? 'Mi boda',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
@@ -175,7 +173,7 @@ class _WeddingDashboard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      daysLeft > 0 ? 'jours restants' : 'Le jour J est arrivé ! 🎉',
+                      daysLeft > 0 ? 'días restantes' : '¡Llegó el gran día! 🎉',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
@@ -199,7 +197,7 @@ class _WeddingDashboard extends StatelessWidget {
                 Expanded(
                   child: _StatCard(
                     icon: Icons.people_rounded,
-                    label: 'Invités',
+                    label: 'Invitados',
                     value: '${guestStats['total']}',
                     color: AppTheme.primary,
                   ),
@@ -208,7 +206,7 @@ class _WeddingDashboard extends StatelessWidget {
                 Expanded(
                   child: _StatCard(
                     icon: Icons.check_circle_rounded,
-                    label: 'Confirmés',
+                    label: 'Confirmados',
                     value: '${guestStats['confirmed']}',
                     color: AppTheme.success,
                   ),
@@ -217,7 +215,7 @@ class _WeddingDashboard extends StatelessWidget {
                 Expanded(
                   child: _StatCard(
                     icon: Icons.schedule_rounded,
-                    label: 'En attente',
+                    label: 'Pendientes',
                     value: '${guestStats['pending']}',
                     color: AppTheme.warning,
                   ),
@@ -227,7 +225,7 @@ class _WeddingDashboard extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Quick Actions
-            Text('Outils', style: Theme.of(context).textTheme.titleMedium),
+            Text('Herramientas', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             GridView.count(
               crossAxisCount: 2,
@@ -239,29 +237,29 @@ class _WeddingDashboard extends StatelessWidget {
               children: [
                 _QuickAction(
                   icon: Icons.checklist_rounded,
-                  label: 'Check-list',
-                  subtitle: 'Tâches à faire',
+                  label: 'Checklist',
+                  subtitle: 'Tareas pendientes',
                   color: const Color(0xFF6366F1),
                   onTap: () => context.go('/checklist'),
                 ),
                 _QuickAction(
                   icon: Icons.account_balance_wallet_rounded,
-                  label: 'Budget',
-                  subtitle: 'Suivi dépenses',
+                  label: 'Presupuesto',
+                  subtitle: 'Seguimiento de gastos',
                   color: const Color(0xFF10B981),
                   onTap: () => context.go('/budget'),
                 ),
                 _QuickAction(
                   icon: Icons.people_rounded,
-                  label: 'Invités',
-                  subtitle: 'Liste & RSVP',
+                  label: 'Invitados',
+                  subtitle: 'Lista y confirmaciones',
                   color: const Color(0xFFF59E0B),
                   onTap: () => context.go('/guests'),
                 ),
                 _QuickAction(
                   icon: Icons.table_restaurant_rounded,
-                  label: 'Plan de table',
-                  subtitle: 'Placement',
+                  label: 'Asignación de mesas',
+                  subtitle: 'Ubicación',
                   color: const Color(0xFFEC4899),
                   onTap: () => context.push('/seating'),
                 ),
@@ -288,7 +286,7 @@ class _WeddingDashboard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Lieu de réception', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          const Text('Lugar de recepción', style: TextStyle(fontSize: 12, color: Colors.grey)),
                           Text(
                             wedding['venue'],
                             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),

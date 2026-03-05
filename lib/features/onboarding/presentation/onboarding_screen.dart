@@ -17,21 +17,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _pages = const [
     _OnboardingPage(
       icon: Icons.favorite_rounded,
-      title: 'Organisez votre mariage',
+      title: 'Organiza tu boda',
       subtitle:
-          'Checklist, budget, invités, planning… Tous les outils pour un mariage réussi, au même endroit.',
+          'Checklist, presupuesto, invitados, agenda… Todas las herramientas para una boda exitosa, en un solo lugar.',
     ),
     _OnboardingPage(
       icon: Icons.check_circle_rounded,
-      title: 'Suivez vos tâches',
+      title: 'Da seguimiento a tus tareas',
       subtitle:
-          'Ne manquez aucune étape grâce à une checklist complète et personnalisable.',
+          'No te pierdas ningún paso gracias a un checklist completo y personalizable.',
     ),
     _OnboardingPage(
       icon: Icons.people_rounded,
-      title: 'Gérez vos invités',
+      title: 'Administra tus invitados',
       subtitle:
-          'Ajoutez vos invités, suivez les RSVP et créez votre plan de table.',
+          'Agrega a tus invitados, da seguimiento a las confirmaciones y crea tu distribución de mesas.',
     ),
   ];
 
@@ -53,7 +53,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () => context.go('/login'),
-                child: const Text('Passer'),
+                child: const Text('Saltar'),
               ),
             ),
             // Pages
@@ -105,8 +105,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   },
                   child: Text(
                     _currentPage < _pages.length - 1
-                        ? 'Suivant'
-                        : 'Commencer',
+                        ? 'Siguiente'
+                        : 'Comenzar',
                   ),
                 ),
               ),

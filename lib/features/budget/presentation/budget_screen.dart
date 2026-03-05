@@ -27,21 +27,21 @@ class BudgetScreen extends ConsumerStatefulWidget {
 
 class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   final double _totalBudget = 25000;
-  final _currencyFormat = NumberFormat.currency(locale: 'fr_FR', symbol: '€');
+  final _currencyFormat = NumberFormat.currency(locale: 'es_MX', symbol: r'$');
 
   final List<_BudgetItem> _items = [
-    _BudgetItem(category: 'Lieu', label: 'Location salle', estimated: 5000),
-    _BudgetItem(category: 'Lieu', label: 'Hébergement', estimated: 1500),
-    _BudgetItem(category: 'Traiteur', label: 'Repas & boissons', estimated: 8000),
-    _BudgetItem(category: 'Traiteur', label: 'Gâteau', estimated: 500),
-    _BudgetItem(category: 'Tenues', label: 'Robe / Costume', estimated: 2000),
-    _BudgetItem(category: 'Tenues', label: 'Alliances', estimated: 1000),
-    _BudgetItem(category: 'Déco', label: 'Fleurs & déco', estimated: 2000),
-    _BudgetItem(category: 'Musique', label: 'DJ / Orchestre', estimated: 1500),
-    _BudgetItem(category: 'Photo', label: 'Photographe', estimated: 1800),
-    _BudgetItem(category: 'Photo', label: 'Vidéaste', estimated: 1200),
-    _BudgetItem(category: 'Divers', label: 'Faire-part', estimated: 300),
-    _BudgetItem(category: 'Divers', label: 'Cadeaux invités', estimated: 400),
+    _BudgetItem(category: 'Lugar', label: 'Renta del salón', estimated: 5000),
+    _BudgetItem(category: 'Lugar', label: 'Hospedaje', estimated: 1500),
+    _BudgetItem(category: 'Banquete', label: 'Comida y bebidas', estimated: 8000),
+    _BudgetItem(category: 'Banquete', label: 'Pastel', estimated: 500),
+    _BudgetItem(category: 'Vestimenta', label: 'Vestido / Traje', estimated: 2000),
+    _BudgetItem(category: 'Vestimenta', label: 'Anillos', estimated: 1000),
+    _BudgetItem(category: 'Decoración', label: 'Flores y decoración', estimated: 2000),
+    _BudgetItem(category: 'Música', label: 'DJ / Grupo musical', estimated: 1500),
+    _BudgetItem(category: 'Foto', label: 'Fotógrafo', estimated: 1800),
+    _BudgetItem(category: 'Foto', label: 'Videógrafo', estimated: 1200),
+    _BudgetItem(category: 'Varios', label: 'Invitaciones', estimated: 300),
+    _BudgetItem(category: 'Varios', label: 'Recuerdos para invitados', estimated: 400),
   ];
 
   @override
@@ -59,7 +59,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('Budget'),
+        title: const Text('Presupuesto'),
         centerTitle: false,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -85,7 +85,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
               child: Column(
                 children: [
                   const Text(
-                    'Budget total',
+                    'Presupuesto total',
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   const SizedBox(height: 4),
@@ -102,7 +102,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                     children: [
                       Expanded(
                         child: _SummaryCell(
-                          label: 'Dépensé',
+                          label: 'Gastado',
                           value: _currencyFormat.format(totalActual),
                           color: Colors.white,
                         ),
@@ -114,7 +114,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                       ),
                       Expanded(
                         child: _SummaryCell(
-                          label: 'Restant',
+                          label: 'Restante',
                           value: _currencyFormat.format(remaining),
                           color: remaining >= 0 ? Colors.white : const Color(0xFFFCA5A5),
                         ),
@@ -175,7 +175,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                           style: const TextStyle(fontSize: 14),
                         ),
                         subtitle: Text(
-                          'Estimé: ${_currencyFormat.format(item.estimated)}',
+                          'Estimado: ${_currencyFormat.format(item.estimated)}',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey.shade500,
@@ -183,7 +183,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                         ),
                         trailing: item.paid
                             ? Chip(
-                                label: const Text('Payé'),
+                                label: const Text('Pagado'),
                                 backgroundColor: AppTheme.success.withOpacity(0.1),
                                 labelStyle: TextStyle(
                                   color: AppTheme.success,

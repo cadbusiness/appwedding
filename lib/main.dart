@@ -15,7 +15,7 @@ Future<void> main() async {
     anonKey: SupabaseConfig.anonKey,
   );
 
-  await initializeDateFormatting('fr_FR', null);
+  await initializeDateFormatting('es_MX', null);
 
   runApp(const ProviderScope(child: MyWeddingApp()));
 }
@@ -28,7 +28,7 @@ class MyWeddingApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      title: 'My Wedding',
+      title: 'Mi Boda',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       routerConfig: router,

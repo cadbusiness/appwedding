@@ -33,23 +33,23 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
-      GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
-      GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
-      GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
+      GoRoute(path: '/splash', builder: (_, _) => const SplashScreen()),
+      GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
+      GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
+      GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
       ShellRoute(
         builder: (context, state, child) => HomeScreen(child: child),
         routes: [
-          GoRoute(path: '/', builder: (_, __) => const DashboardScreen()),
-          GoRoute(path: '/checklist', builder: (_, __) => const ChecklistScreen()),
-          GoRoute(path: '/budget', builder: (_, __) => const BudgetScreen()),
-          GoRoute(path: '/guests', builder: (_, __) => const GuestsScreen()),
-          GoRoute(path: '/timeline', builder: (_, __) => const TimelineScreen()),
+          GoRoute(path: '/', builder: (_, _) => const DashboardScreen()),
+          GoRoute(path: '/checklist', builder: (_, _) => const ChecklistScreen()),
+          GoRoute(path: '/budget', builder: (_, _) => const BudgetScreen()),
+          GoRoute(path: '/guests', builder: (_, _) => const GuestsScreen()),
+          GoRoute(path: '/timeline', builder: (_, _) => const TimelineScreen()),
         ],
       ),
-      GoRoute(path: '/seating', builder: (_, __) => const SeatingScreen()),
-      GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
-      GoRoute(path: '/wedding/create', builder: (_, __) => const CreateWeddingScreen()),
+      GoRoute(path: '/seating', builder: (_, _) => const SeatingScreen()),
+      GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
+      GoRoute(path: '/wedding/create', builder: (_, _) => const CreateWeddingScreen()),
     ],
   );
 });

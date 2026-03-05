@@ -20,45 +20,45 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   // Sample timeline events
   final List<_TimelineEvent> _events = [
     _TimelineEvent(
-      title: 'Cérémonie civile',
+      title: 'Ceremonia civil',
       time: '10:00',
-      location: 'Mairie',
+      location: 'Registro Civil',
       icon: Icons.account_balance_rounded,
     ),
     _TimelineEvent(
-      title: 'Cérémonie religieuse',
+      title: 'Ceremonia religiosa',
       time: '14:00',
-      location: 'Église',
+      location: 'Iglesia',
       icon: Icons.church_rounded,
     ),
     _TimelineEvent(
-      title: 'Cocktail',
+      title: 'Cóctel',
       time: '16:00',
-      location: 'Jardin du château',
+      location: 'Jardín del salón',
       icon: Icons.local_bar_rounded,
     ),
     _TimelineEvent(
-      title: 'Photos de groupe',
+      title: 'Fotos de grupo',
       time: '17:00',
-      location: 'Parc',
+      location: 'Parque',
       icon: Icons.camera_alt_rounded,
     ),
     _TimelineEvent(
-      title: 'Dîner',
+      title: 'Cena',
       time: '19:30',
-      location: 'Salle de réception',
+      location: 'Salón de recepción',
       icon: Icons.restaurant_rounded,
     ),
     _TimelineEvent(
-      title: 'Ouverture du bal',
+      title: 'Primer baile',
       time: '22:00',
-      location: 'Piste de danse',
+      location: 'Pista de baile',
       icon: Icons.music_note_rounded,
     ),
     _TimelineEvent(
-      title: 'Soirée dansante',
+      title: 'Fiesta',
       time: '22:30',
-      location: 'Salle de réception',
+      location: 'Salón de recepción',
       icon: Icons.nightlife_rounded,
     ),
   ];
@@ -70,7 +70,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('Planning'),
+        title: const Text('Agenda'),
         centerTitle: false,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -86,7 +86,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                 firstDay: DateTime.utc(2024, 1, 1),
                 lastDay: DateTime.utc(2030, 12, 31),
                 focusedDay: _focusedDay,
-                locale: 'fr_FR',
+                locale: 'es_MX',
                 calendarFormat: _calendarFormat,
                 onFormatChanged: (format) =>
                     setState(() => _calendarFormat = format),
@@ -127,7 +127,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'Déroulé du jour J',
+                'Programa del gran día',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),

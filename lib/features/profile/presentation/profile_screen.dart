@@ -19,7 +19,7 @@ class ProfileScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('Mon profil'),
+        title: const Text('Mi perfil'),
         centerTitle: false,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -45,7 +45,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    profile.value?['full_name'] ?? 'Utilisateur',
+                    profile.value?['full_name'] ?? 'Usuario',
                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 4),
@@ -62,7 +62,7 @@ class ProfileScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        sub != null ? 'Plan ${sub['plan'] ?? 'Premium'}' : 'Plan Gratuit',
+                        sub != null ? 'Plan ${sub['plan'] ?? 'Premium'}' : 'Plan Gratuito',
                         style: TextStyle(
                           color: sub != null ? AppTheme.primary : Colors.grey,
                           fontWeight: FontWeight.w600,
@@ -71,16 +71,16 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                     ),
                     loading: () => const SizedBox(),
-                    error: (_, __) => const SizedBox(),
+                    error: (_, _) => const SizedBox(),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            _ProfileTile(icon: Icons.notifications_outlined, label: 'Notifications', onTap: () {}),
-            _ProfileTile(icon: Icons.lock_outline_rounded, label: 'Confidentialité', onTap: () {}),
-            _ProfileTile(icon: Icons.help_outline_rounded, label: 'Aide & Support', onTap: () {}),
-            _ProfileTile(icon: Icons.info_outline_rounded, label: 'À propos', onTap: () {}),
+            _ProfileTile(icon: Icons.notifications_outlined, label: 'Notificaciones', onTap: () {}),
+            _ProfileTile(icon: Icons.lock_outline_rounded, label: 'Privacidad', onTap: () {}),
+            _ProfileTile(icon: Icons.help_outline_rounded, label: 'Ayuda y Soporte', onTap: () {}),
+            _ProfileTile(icon: Icons.info_outline_rounded, label: 'Acerca de', onTap: () {}),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
@@ -91,7 +91,7 @@ class ProfileScreen extends ConsumerWidget {
                   if (context.mounted) context.go('/login');
                 },
                 icon: const Icon(Icons.logout_rounded, color: Colors.red),
-                label: const Text('Se déconnecter', style: TextStyle(color: Colors.red)),
+                label: const Text('Cerrar sesión', style: TextStyle(color: Colors.red)),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.red),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

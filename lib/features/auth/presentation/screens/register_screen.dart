@@ -69,7 +69,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: $e'),
+            content: Text('Error: $e'),
             backgroundColor: AppTheme.error,
           ),
         );
@@ -108,12 +108,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 32),
                 Text(
-                  'Créer un compte',
+                  'Crear una cuenta',
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Commencez à organiser votre mariage de rêve',
+                  'Comienza a organizar la boda de tus sueños',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 32),
@@ -129,7 +129,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       Expanded(
                         child: _RoleTab(
                           icon: Icons.favorite_rounded,
-                          label: 'Couple',
+                          label: 'Pareja',
                           selected: _selectedRole == 'self_planner',
                           onTap: () => setState(
                               () => _selectedRole = 'self_planner'),
@@ -138,7 +138,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       Expanded(
                         child: _RoleTab(
                           icon: Icons.business_center_rounded,
-                          label: 'Professionnel',
+                          label: 'Profesional',
                           selected:
                               _selectedRole == 'wedding_planner',
                           onTap: () => setState(
@@ -155,12 +155,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textCapitalization: TextCapitalization.words,
                   autofillHints: const [AutofillHints.name],
                   decoration: const InputDecoration(
-                    labelText: 'Nom complet',
-                    hintText: 'Marie & Pierre',
+                    labelText: 'Nombre completo',
+                    hintText: 'María & Pedro',
                     prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Nom requis';
+                    if (v == null || v.isEmpty) return 'Nombre requerido';
                     return null;
                   },
                 ),
@@ -171,13 +171,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
                   decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'vous@email.com',
+                    labelText: 'Correo electrónico',
+                    hintText: 'tu@email.com',
                     prefixIcon: Icon(Icons.mail_outline_rounded, size: 20),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Email requis';
-                    if (!v.contains('@')) return 'Email invalide';
+                    if (v == null || v.isEmpty) return 'Correo requerido';
+                    if (!v.contains('@')) return 'Correo inválido';
                     return null;
                   },
                 ),
@@ -188,7 +188,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   obscureText: _obscurePassword,
                   autofillHints: const [AutofillHints.newPassword],
                   decoration: InputDecoration(
-                    labelText: 'Mot de passe',
+                    labelText: 'Contraseña',
                     prefixIcon:
                         const Icon(Icons.lock_outline_rounded, size: 20),
                     suffixIcon: IconButton(
@@ -204,7 +204,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (v) {
                     if (v == null || v.length < 6) {
-                      return '6 caractères minimum';
+                      return '6 caracteres mínimo';
                     }
                     return null;
                   },
@@ -224,7 +224,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text("S'inscrire"),
+                        : const Text('Registrarse'),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -233,13 +233,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Déjà un compte ? ',
+                      '¿Ya tienes cuenta? ',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     GestureDetector(
                       onTap: () => context.go('/login'),
                       child: Text(
-                        'Se connecter',
+                        'Iniciar sesión',
                         style: TextStyle(
                           color: AppTheme.primary,
                           fontWeight: FontWeight.w600,

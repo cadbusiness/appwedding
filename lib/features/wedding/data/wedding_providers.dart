@@ -90,6 +90,6 @@ final guestStatsProvider = Provider<Map<String, int>>((ref) {
       };
     },
     loading: () => {'total': 0, 'confirmed': 0, 'declined': 0, 'pending': 0},
-    error: (_, __) => {'total': 0, 'confirmed': 0, 'declined': 0, 'pending': 0},
+    error: (_, _) => {'total': 0, 'confirmed': 0, 'declined': 0, 'pending': 0},
   );
 });
