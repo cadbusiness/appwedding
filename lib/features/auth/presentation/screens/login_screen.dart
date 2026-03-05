@@ -158,7 +158,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         GestureDetector(
-                          onTap: () => context.go('/register'),
+                          onTap: () => context.go('/onboarding'),
                           child: Text(
                             'Crear cuenta',
                             style: TextStyle(

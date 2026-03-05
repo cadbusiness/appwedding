@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/config/app_constants.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../widgets/auth_hero.dart';
 
@@ -50,43 +51,34 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     setState(() => _loading = true);
 
     try {
+      // Build wedding title from onboarding data
+      final data = widget.onboardingData;
+      final weddingTitle = data?['wedding_title'] ?? 'Mi boda';
+
+      // Signup with metadata — the Supabase trigger (handle_new_user)
+      // will automatically:
+      // 1. Create profile
+      // 2. Assign 'self_planner' role
+      // 3. Create wedding in 'resold' mode linked to the planner
+      // 4. Create free subscription
       final res = await Supabase.instance.client.auth.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         data: {
           'full_name': _nameController.text.trim(),
+          'signup_mode': 'self_planner',
+          'referred_by_planner_id': AppConstants.plannerId,
+          'wedding_title': weddingTitle,
+          if (data?['wedding_date'] != null)
+            'wedding_date': data!['wedding_date'],
+          if (data?['wedding_style'] != null)
+            'wedding_style': data!['wedding_style'],
+          if (data?['guest_count'] != null)
+            'guest_count': data!['guest_count'],
         },
       );
 
       if (res.user != null) {
-        // Insert user role (B2C app = always self_planner)
-        await Supabase.instance.client.from('user_roles').insert({
-          'user_id': res.user!.id,
-          'role': 'self_planner',
-        });
-
-        // Update profile
-        await Supabase.instance.client.from('profiles').upsert({
-          'id': res.user!.id,
-          'full_name': _nameController.text.trim(),
-          'email': _emailController.text.trim(),
-        });
-
-        // Auto-create wedding with onboarding data if available
-        final data = widget.onboardingData;
-        if (data != null) {
-          final weddingDate = data['wedding_date'] != null
-              ? DateTime.parse(data['wedding_date']).toIso8601String().split('T').first
-              : DateTime.now().add(const Duration(days: 180)).toIso8601String().split('T').first;
-
-          await Supabase.instance.client.rpc('create_self_wedding', params: {
-            'p_title': data['wedding_title'] ?? 'Mi boda',
-            'p_wedding_date': weddingDate,
-            'p_venue': null,
-            'p_budget': 15000,
-          });
-        }
-
         if (mounted) context.go('/');
       }
     } on AuthException catch (e) {

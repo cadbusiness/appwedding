@@ -22,7 +22,7 @@ class AuthHero extends StatelessWidget {
               bottomRight: Radius.circular(32),
             ),
             child: Image.asset(
-              'assets/images/auth_hero.jpg',
+              'assets/images/wedding_hero.jpg',
               fit: BoxFit.cover,
             ),
           ),
@@ -45,48 +45,18 @@ class AuthHero extends StatelessWidget {
               ),
             ),
           ),
-          // Logo + text centered
+          // Logo centered
           Positioned(
-            bottom: 32,
-            left: 24,
-            right: 24,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: const Icon(
-                    Icons.favorite_rounded,
-                    color: Color(0xFF1A1A1A),
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Mi Boda',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Tu boda, simplificada',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.85),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
+            bottom: 24,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 300,
+                height: 100,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
         ],
