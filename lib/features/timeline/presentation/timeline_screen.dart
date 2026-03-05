@@ -2,8 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../../../core/providers/auth_providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../wedding/data/wedding_providers.dart';
+
+const _defaultTimelineSeed = [
+  {'title': 'Ceremonia civil', 'event_time': '10:00:00', 'location': 'Registro Civil', 'category': 'Ceremonia', 'sort_order': 0},
+  {'title': 'Ceremonia religiosa', 'event_time': '14:00:00', 'location': 'Iglesia', 'category': 'Ceremonia', 'sort_order': 1},
+  {'title': 'Cóctel', 'event_time': '16:00:00', 'location': 'Jardín del salón', 'category': 'Recepción', 'sort_order': 2},
+  {'title': 'Fotos de grupo', 'event_time': '17:00:00', 'location': 'Parque', 'category': 'Fotos', 'sort_order': 3},
+  {'title': 'Cena', 'event_time': '19:30:00', 'location': 'Salón de recepción', 'category': 'Recepción', 'sort_order': 4},
+  {'title': 'Primer baile', 'event_time': '22:00:00', 'location': 'Pista de baile', 'category': 'Fiesta', 'sort_order': 5},
+  {'title': 'Fiesta', 'event_time': '22:30:00', 'location': 'Salón de recepción', 'category': 'Fiesta', 'sort_order': 6},
+];
+
+const _categoryIcons = <String, IconData>{
+  'Ceremonia': Icons.church_rounded,
+  'Recepción': Icons.restaurant_rounded,
+  'Fotos': Icons.camera_alt_rounded,
+  'Fiesta': Icons.nightlife_rounded,
+};
 
 class TimelineScreen extends ConsumerStatefulWidget {
   const TimelineScreen({super.key});
@@ -16,56 +34,26 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   CalendarFormat _calendarFormat = CalendarFormat.month;
+  bool _seeded = false;
 
-  // Sample timeline events
-  final List<_TimelineEvent> _events = [
-    _TimelineEvent(
-      title: 'Ceremonia civil',
-      time: '10:00',
-      location: 'Registro Civil',
-      icon: Icons.account_balance_rounded,
-    ),
-    _TimelineEvent(
-      title: 'Ceremonia religiosa',
-      time: '14:00',
-      location: 'Iglesia',
-      icon: Icons.church_rounded,
-    ),
-    _TimelineEvent(
-      title: 'Cóctel',
-      time: '16:00',
-      location: 'Jardín del salón',
-      icon: Icons.local_bar_rounded,
-    ),
-    _TimelineEvent(
-      title: 'Fotos de grupo',
-      time: '17:00',
-      location: 'Parque',
-      icon: Icons.camera_alt_rounded,
-    ),
-    _TimelineEvent(
-      title: 'Cena',
-      time: '19:30',
-      location: 'Salón de recepción',
-      icon: Icons.restaurant_rounded,
-    ),
-    _TimelineEvent(
-      title: 'Primer baile',
-      time: '22:00',
-      location: 'Pista de baile',
-      icon: Icons.music_note_rounded,
-    ),
-    _TimelineEvent(
-      title: 'Fiesta',
-      time: '22:30',
-      location: 'Salón de recepción',
-      icon: Icons.nightlife_rounded,
-    ),
-  ];
+  Future<void> _seedDefaults(String weddingId) async {
+    if (_seeded) return;
+    _seeded = true;
+    final supabase = ref.read(supabaseProvider);
+    final rows = _defaultTimelineSeed
+        .map((item) => {
+              ...item,
+              'wedding_id': weddingId,
+            })
+        .toList();
+    await supabase.from('wedding_timeline_events').insert(rows);
+    ref.invalidate(weddingTimelineProvider);
+  }
 
   @override
   Widget build(BuildContext context) {
     final weddingAsync = ref.watch(weddingProvider);
+    final timelineAsync = ref.watch(weddingTimelineProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -132,124 +120,144 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            ..._events.asMap().entries.map((entry) {
-              final index = entry.key;
-              final event = entry.value;
-              final isLast = index == _events.length - 1;
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Timeline line
-                      SizedBox(
-                        width: 50,
-                        child: Column(
+            timelineAsync.when(
+              loading: () =>
+                  const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Error: $e')),
+              data: (events) {
+                final wedding = weddingAsync.value;
+                if (events.isEmpty && wedding != null) {
+                  Future.microtask(() => _seedDefaults(wedding['id']));
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return Column(
+                  children: events.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final event = entry.value;
+                    final isLast = index == events.length - 1;
+                    final time = (event['event_time'] as String?)
+                            ?.substring(0, 5) ??
+                        '--:--';
+                    final icon =
+                        _categoryIcons[event['category']] ??
+                            Icons.event_rounded;
+
+                    return Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 20),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                color: AppTheme.primary,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            if (!isLast)
-                              Expanded(
-                                child: Container(
-                                  width: 2,
-                                  color: AppTheme.primary.withOpacity(0.2),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      // Event card
-                      Expanded(
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey.shade100),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.primary.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Icon(
-                                  event.icon,
-                                  color: AppTheme.primary,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      event.title,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 15,
+                            SizedBox(
+                              width: 50,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 12,
+                                    height: 12,
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.primary,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  if (!isLast)
+                                    Expanded(
+                                      child: Container(
+                                        width: 2,
+                                        color: AppTheme.primary
+                                            .withOpacity(0.2),
                                       ),
                                     ),
-                                    const SizedBox(height: 2),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                margin:
+                                    const EdgeInsets.only(bottom: 16),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius:
+                                      BorderRadius.circular(12),
+                                  border: Border.all(
+                                      color: Colors.grey.shade100),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.primary
+                                            .withOpacity(0.1),
+                                        borderRadius:
+                                            BorderRadius.circular(
+                                                10),
+                                      ),
+                                      child: Icon(
+                                        icon,
+                                        color: AppTheme.primary,
+                                        size: 20,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment
+                                                .start,
+                                        children: [
+                                          Text(
+                                            event['title'] ?? '',
+                                            style:
+                                                const TextStyle(
+                                              fontWeight:
+                                                  FontWeight.w600,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            event['location'] ??
+                                                '',
+                                            style: TextStyle(
+                                              color: Colors
+                                                  .grey.shade500,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                     Text(
-                                      event.location,
+                                      time,
                                       style: TextStyle(
-                                        color: Colors.grey.shade500,
-                                        fontSize: 13,
+                                        color: AppTheme.primary,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 15,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              Text(
-                                event.time,
-                                style: TextStyle(
-                                  color: AppTheme.primary,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              );
-            }),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
             const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
-}
-
-class _TimelineEvent {
-  final String title;
-  final String time;
-  final String location;
-  final IconData icon;
-
-  _TimelineEvent({
-    required this.title,
-    required this.time,
-    required this.location,
-    required this.icon,
-  });
 }

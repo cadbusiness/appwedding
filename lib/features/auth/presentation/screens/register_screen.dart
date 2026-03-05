@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 import '../../../../core/theme/app_theme.dart';
+import '../widgets/auth_hero.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -83,40 +83,30 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 32),
-                // Logo
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.favorite_rounded,
-                    color: Colors.white,
-                    size: 32,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Text(
-                  'Crear una cuenta',
-                  style: Theme.of(context).textTheme.headlineLarge,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Comienza a organizar la boda de tus sueños',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 32),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Hero image with gradient
+            const AuthHero(height: 240),
+            // Form content
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Créer un compte',
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Commencez à organiser votre mariage de rêve',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 24),
                 // Role selector
                 Container(
                   decoration: BoxDecoration(
@@ -129,7 +119,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       Expanded(
                         child: _RoleTab(
                           icon: Icons.favorite_rounded,
-                          label: 'Pareja',
+                          label: 'Couple',
                           selected: _selectedRole == 'self_planner',
                           onTap: () => setState(
                               () => _selectedRole = 'self_planner'),
@@ -138,7 +128,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       Expanded(
                         child: _RoleTab(
                           icon: Icons.business_center_rounded,
-                          label: 'Profesional',
+                          label: 'Professionnel',
                           selected:
                               _selectedRole == 'wedding_planner',
                           onTap: () => setState(
@@ -155,12 +145,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textCapitalization: TextCapitalization.words,
                   autofillHints: const [AutofillHints.name],
                   decoration: const InputDecoration(
-                    labelText: 'Nombre completo',
-                    hintText: 'María & Pedro',
+                    labelText: 'Nom complet',
+                    hintText: 'Marie & Pierre',
                     prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Nombre requerido';
+                    if (v == null || v.isEmpty) return 'Nom requis';
                     return null;
                   },
                 ),
@@ -171,13 +161,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
                   decoration: const InputDecoration(
-                    labelText: 'Correo electrónico',
+                    labelText: 'Adresse e-mail',
                     hintText: 'tu@email.com',
                     prefixIcon: Icon(Icons.mail_outline_rounded, size: 20),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Correo requerido';
-                    if (!v.contains('@')) return 'Correo inválido';
+                    if (v == null || v.isEmpty) return 'E-mail requis';
+                    if (!v.contains('@')) return 'E-mail invalide';
                     return null;
                   },
                 ),
@@ -188,7 +178,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   obscureText: _obscurePassword,
                   autofillHints: const [AutofillHints.newPassword],
                   decoration: InputDecoration(
-                    labelText: 'Contraseña',
+                    labelText: 'Mot de passe',
                     prefixIcon:
                         const Icon(Icons.lock_outline_rounded, size: 20),
                     suffixIcon: IconButton(
@@ -204,7 +194,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (v) {
                     if (v == null || v.length < 6) {
-                      return '6 caracteres mínimo';
+                      return '6 caractères minimum';
                     }
                     return null;
                   },
@@ -224,7 +214,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Registrarse'),
+                        : const Text('Créer mon compte'),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -233,13 +223,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '¿Ya tienes cuenta? ',
+                      'Déjà un compte ? ',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     GestureDetector(
                       onTap: () => context.go('/login'),
                       child: Text(
-                        'Iniciar sesión',
+                        'Se connecter',
                         style: TextStyle(
                           color: AppTheme.primary,
                           fontWeight: FontWeight.w600,
@@ -249,9 +239,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
               ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

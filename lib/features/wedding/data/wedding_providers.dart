@@ -93,3 +93,51 @@ final guestStatsProvider = Provider<Map<String, int>>((ref) {
     error: (_, _) => {'total': 0, 'confirmed': 0, 'declined': 0, 'pending': 0},
   );
 });
+
+// ── Checklist ───────────────────────────────────────────────
+final weddingChecklistProvider =
+    FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final wedding = await ref.watch(weddingProvider.future);
+  if (wedding == null) return [];
+
+  final supabase = ref.watch(supabaseProvider);
+  final rows = await supabase
+      .from('wedding_checklist_items')
+      .select()
+      .eq('wedding_id', wedding['id'])
+      .order('sort_order');
+
+  return List<Map<String, dynamic>>.from(rows);
+});
+
+// ── Budget ──────────────────────────────────────────────────
+final weddingBudgetProvider =
+    FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final wedding = await ref.watch(weddingProvider.future);
+  if (wedding == null) return [];
+
+  final supabase = ref.watch(supabaseProvider);
+  final rows = await supabase
+      .from('wedding_budget_items')
+      .select()
+      .eq('wedding_id', wedding['id'])
+      .order('sort_order');
+
+  return List<Map<String, dynamic>>.from(rows);
+});
+
+// ── Timeline Events ─────────────────────────────────────────
+final weddingTimelineProvider =
+    FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final wedding = await ref.watch(weddingProvider.future);
+  if (wedding == null) return [];
+
+  final supabase = ref.watch(supabaseProvider);
+  final rows = await supabase
+      .from('wedding_timeline_events')
+      .select()
+      .eq('wedding_id', wedding['id'])
+      .order('event_time');
+
+  return List<Map<String, dynamic>>.from(rows);
+});

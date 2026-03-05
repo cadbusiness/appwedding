@@ -1,47 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/providers/auth_providers.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../wedding/data/wedding_providers.dart';
 
-// Simple local checklist items - can be extended to Supabase later
-final _defaultCategories = [
-  _ChecklistCategory('Lugar y Recepción', Icons.location_on_rounded, [
-    'Reservar el lugar de la ceremonia',
-    'Reservar el lugar de la recepción',
-    'Visitar los lugares potenciales',
-    'Confirmar los horarios',
-  ]),
-  _ChecklistCategory('Banquete y Bebidas', Icons.restaurant_rounded, [
-    'Elegir el banquete',
-    'Degustación del menú',
-    'Confirmar el menú final',
-    'Encargar el pastel',
-  ]),
-  _ChecklistCategory('Vestimenta y Belleza', Icons.checkroom_rounded, [
-    'Prueba de vestido/traje',
-    'Elegir los anillos',
-    'Prueba de peinado y maquillaje',
-    'Vestimenta de los padrinos',
-  ]),
-  _ChecklistCategory('Decoración y Flores', Icons.local_florist_rounded, [
-    'Elegir al florista',
-    'Definir el tema de decoración',
-    'Encargar los centros de mesa',
-    'Ramo de la novia',
-  ]),
-  _ChecklistCategory('Música y Entretenimiento', Icons.music_note_rounded, [
-    'Reservar DJ/grupo musical',
-    'Playlist de la ceremonia',
-    'Entretenimiento de la fiesta',
-    'Photobooth',
-  ]),
-  _ChecklistCategory('Trámites', Icons.description_rounded, [
-    'Trámites del registro civil',
-    'Expediente municipal',
-    'Contrato de seguro',
-    'Invitaciones enviadas',
-  ]),
+/// Default items seeded on first visit (no local items exist in DB yet).
+const _defaultSeedItems = [
+  {'title': 'Reservar el lugar de la ceremonia', 'category': 'Lugar y Recepción', 'sort_order': 0},
+  {'title': 'Reservar el lugar de la recepción', 'category': 'Lugar y Recepción', 'sort_order': 1},
+  {'title': 'Visitar los lugares potenciales', 'category': 'Lugar y Recepción', 'sort_order': 2},
+  {'title': 'Confirmar los horarios', 'category': 'Lugar y Recepción', 'sort_order': 3},
+  {'title': 'Elegir el banquete', 'category': 'Banquete y Bebidas', 'sort_order': 4},
+  {'title': 'Degustación del menú', 'category': 'Banquete y Bebidas', 'sort_order': 5},
+  {'title': 'Confirmar el menú final', 'category': 'Banquete y Bebidas', 'sort_order': 6},
+  {'title': 'Encargar el pastel', 'category': 'Banquete y Bebidas', 'sort_order': 7},
+  {'title': 'Prueba de vestido/traje', 'category': 'Vestimenta y Belleza', 'sort_order': 8},
+  {'title': 'Elegir los anillos', 'category': 'Vestimenta y Belleza', 'sort_order': 9},
+  {'title': 'Prueba de peinado y maquillaje', 'category': 'Vestimenta y Belleza', 'sort_order': 10},
+  {'title': 'Vestimenta de los padrinos', 'category': 'Vestimenta y Belleza', 'sort_order': 11},
+  {'title': 'Elegir al florista', 'category': 'Decoración y Flores', 'sort_order': 12},
+  {'title': 'Definir el tema de decoración', 'category': 'Decoración y Flores', 'sort_order': 13},
+  {'title': 'Encargar los centros de mesa', 'category': 'Decoración y Flores', 'sort_order': 14},
+  {'title': 'Ramo de la novia', 'category': 'Decoración y Flores', 'sort_order': 15},
+  {'title': 'Reservar DJ/grupo musical', 'category': 'Música y Entretenimiento', 'sort_order': 16},
+  {'title': 'Playlist de la ceremonia', 'category': 'Música y Entretenimiento', 'sort_order': 17},
+  {'title': 'Entretenimiento de la fiesta', 'category': 'Música y Entretenimiento', 'sort_order': 18},
+  {'title': 'Photobooth', 'category': 'Música y Entretenimiento', 'sort_order': 19},
+  {'title': 'Trámites del registro civil', 'category': 'Trámites', 'sort_order': 20},
+  {'title': 'Expediente municipal', 'category': 'Trámites', 'sort_order': 21},
+  {'title': 'Contrato de seguro', 'category': 'Trámites', 'sort_order': 22},
+  {'title': 'Invitaciones enviadas', 'category': 'Trámites', 'sort_order': 23},
 ];
+
+const _categoryIcons = <String, IconData>{
+  'Lugar y Recepción': Icons.location_on_rounded,
+  'Banquete y Bebidas': Icons.restaurant_rounded,
+  'Vestimenta y Belleza': Icons.checkroom_rounded,
+  'Decoración y Flores': Icons.local_florist_rounded,
+  'Música y Entretenimiento': Icons.music_note_rounded,
+  'Trámites': Icons.description_rounded,
+};
 
 class ChecklistScreen extends ConsumerStatefulWidget {
   const ChecklistScreen({super.key});
@@ -51,14 +50,35 @@ class ChecklistScreen extends ConsumerStatefulWidget {
 }
 
 class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
-  final Map<String, bool> _checked = {};
+  bool _seeded = false;
+
+  Future<void> _seedDefaults(String weddingId) async {
+    if (_seeded) return;
+    _seeded = true;
+    final supabase = ref.read(supabaseProvider);
+    final rows = _defaultSeedItems
+        .map((item) => {
+              ...item,
+              'wedding_id': weddingId,
+              'is_completed': false,
+            })
+        .toList();
+    await supabase.from('wedding_checklist_items').insert(rows);
+    ref.invalidate(weddingChecklistProvider);
+  }
+
+  Future<void> _toggleItem(String id, bool current) async {
+    final supabase = ref.read(supabaseProvider);
+    await supabase
+        .from('wedding_checklist_items')
+        .update({'is_completed': !current}).eq('id', id);
+    ref.invalidate(weddingChecklistProvider);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final totalTasks =
-        _defaultCategories.fold<int>(0, (sum, c) => sum + c.tasks.length);
-    final doneTasks = _checked.values.where((v) => v).length;
-    final progress = totalTasks > 0 ? doneTasks / totalTasks : 0.0;
+    final weddingAsync = ref.watch(weddingProvider);
+    final checklistAsync = ref.watch(weddingChecklistProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -68,142 +88,157 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Progress Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade100),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: checklistAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
+        data: (items) {
+          // Auto-seed on first visit
+          final wedding = weddingAsync.value;
+          if (items.isEmpty && wedding != null) {
+            Future.microtask(() => _seedDefaults(wedding['id']));
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final totalTasks = items.length;
+          final doneTasks =
+              items.where((i) => i['is_completed'] == true).length;
+          final progress = totalTasks > 0 ? doneTasks / totalTasks : 0.0;
+
+          // Group by category
+          final categories = <String, List<Map<String, dynamic>>>{};
+          for (final item in items) {
+            final cat = (item['category'] ?? 'Otros') as String;
+            categories.putIfAbsent(cat, () => []).add(item);
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Progress Card
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade100),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '$doneTasks / $totalTasks tareas',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '$doneTasks / $totalTasks tareas',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            '${(progress * 100).round()}%',
+                            style: TextStyle(
+                              color: AppTheme.primary,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '${(progress * 100).round()}%',
-                        style: TextStyle(
-                          color: AppTheme.primary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
+                      const SizedBox(height: 12),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          minHeight: 8,
+                          backgroundColor: Colors.grey.shade100,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(AppTheme.primary),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 8,
-                      backgroundColor: Colors.grey.shade100,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(AppTheme.primary),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Categories
-            ..._defaultCategories.map((category) {
-              final categoryDone = category.tasks
-                  .where((t) => _checked['${category.title}_$t'] == true)
-                  .length;
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.shade100),
                 ),
-                child: Theme(
-                  data: Theme.of(context).copyWith(
-                    dividerColor: Colors.transparent,
-                  ),
-                  child: ExpansionTile(
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        category.icon,
-                        color: AppTheme.primary,
-                        size: 20,
-                      ),
+                const SizedBox(height: 20),
+
+                // Categories
+                ...categories.entries.map((entry) {
+                  final catDone = entry.value
+                      .where((i) => i['is_completed'] == true)
+                      .length;
+                  final icon =
+                      _categoryIcons[entry.key] ?? Icons.check_circle_outline;
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade100),
                     ),
-                    title: Text(
-                      category.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        dividerColor: Colors.transparent,
                       ),
-                    ),
-                    subtitle: Text(
-                      '$categoryDone / ${category.tasks.length}',
-                      style: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontSize: 13,
-                      ),
-                    ),
-                    children: category.tasks.map((task) {
-                      final key = '${category.title}_$task';
-                      return CheckboxListTile(
-                        value: _checked[key] ?? false,
-                        onChanged: (v) =>
-                            setState(() => _checked[key] = v ?? false),
+                      child: ExpansionTile(
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppTheme.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(icon, color: AppTheme.primary, size: 20),
+                        ),
                         title: Text(
-                          task,
-                          style: TextStyle(
-                            fontSize: 14,
-                            decoration: _checked[key] == true
-                                ? TextDecoration.lineThrough
-                                : null,
-                            color: _checked[key] == true
-                                ? Colors.grey
-                                : Colors.black87,
+                          entry.key,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
                           ),
                         ),
-                        activeColor: AppTheme.primary,
-                        controlAffinity: ListTileControlAffinity.leading,
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 16),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              );
-            }),
-          ],
-        ),
+                        subtitle: Text(
+                          '$catDone / ${entry.value.length}',
+                          style: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 13,
+                          ),
+                        ),
+                        children: entry.value.map((item) {
+                          final checked = item['is_completed'] == true;
+                          return CheckboxListTile(
+                            value: checked,
+                            onChanged: (_) =>
+                                _toggleItem(item['id'], checked),
+                            title: Text(
+                              item['title'] ?? '',
+                              style: TextStyle(
+                                fontSize: 14,
+                                decoration: checked
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                                color:
+                                    checked ? Colors.grey : Colors.black87,
+                              ),
+                            ),
+                            activeColor: AppTheme.primary,
+                            controlAffinity:
+                                ListTileControlAffinity.leading,
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 16),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
-}
-
-class _ChecklistCategory {
-  final String title;
-  final IconData icon;
-  final List<String> tasks;
-
-  _ChecklistCategory(this.title, this.icon, this.tasks);
 }
