@@ -43,7 +43,7 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_date == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Choisissez une date')),
+        const SnackBar(content: Text('Elige una fecha')),
       );
       return;
     }
@@ -81,7 +81,7 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Créer mon mariage'),
+        title: const Text('Crear mi boda'),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
       ),
@@ -93,18 +93,18 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Text(
-                'Votre mariage 💍',
+                'Tu boda 💍',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 24),
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
-                  labelText: 'Titre du mariage',
-                  hintText: 'ex : Mariage de Marie & Pierre',
+                  labelText: 'Título de la boda',
+                  hintText: 'ej: Boda de María y Pedro',
                   prefixIcon: Icon(Icons.favorite_outline_rounded, size: 20),
                 ),
-                validator: (v) => v == null || v.isEmpty ? 'Requis' : null,
+                validator: (v) => v == null || v.isEmpty ? 'Requerido' : null,
               ),
               const SizedBox(height: 16),
               GestureDetector(
@@ -122,8 +122,8 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
                       const SizedBox(width: 12),
                       Text(
                         _date != null
-                            ? DateFormat('d MMMM yyyy', 'fr_FR').format(_date!)
-                            : 'Choisir la date *',
+                            ? DateFormat('d MMMM yyyy', 'es_MX').format(_date!)
+                            : 'Elegir la fecha *',
                         style: TextStyle(
                           fontSize: 15,
                           color: _date != null ? Colors.black87 : Colors.grey,
@@ -137,20 +137,20 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
               TextFormField(
                 controller: _venue,
                 decoration: const InputDecoration(
-                  labelText: 'Lieu (optionnel)',
+                  labelText: 'Lugar (opcional)',
                   prefixIcon: Icon(Icons.location_on_outlined, size: 20),
                 ),
               ),
               const SizedBox(height: 24),
               Text(
-                'Budget estimé',
+                'Presupuesto estimado',
                 style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey.shade700),
               ),
               const SizedBox(height: 8),
               Row(
                 children: [
                   Text(
-                    '${NumberFormat('#,###', 'fr_FR').format(_budget)} €',
+                    '${NumberFormat('#,###', 'es_MX').format(_budget)} \$',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
@@ -165,7 +165,7 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
                 max: 100000,
                 divisions: 99,
                 activeColor: AppTheme.primary,
-                label: '${NumberFormat('#,###', 'fr_FR').format(_budget)} €',
+                label: '${NumberFormat('#,###', 'es_MX').format(_budget)} \$',
                 onChanged: (v) => setState(() => _budget = v.roundToDouble()),
               ),
               const SizedBox(height: 32),
@@ -178,7 +178,7 @@ class _CreateWeddingScreenState extends ConsumerState<CreateWeddingScreen> {
                           width: 20, height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
-                      : const Text('Créer mon mariage 🎉'),
+                      : const Text('Crear mi boda 🎉'),
                 ),
               ),
             ],

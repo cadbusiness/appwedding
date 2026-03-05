@@ -7,7 +7,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../widgets/auth_hero.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
-  const RegisterScreen({super.key});
+  final Map<String, dynamic>? onboardingData;
+  const RegisterScreen({super.key, this.onboardingData});
 
   @override
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
@@ -27,6 +28,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill name from onboarding data if available
+    final data = widget.onboardingData;
+    if (data != null && data['wedding_title'] != null) {
+      // Extract names from "Boda de X & Y"
+      final title = data['wedding_title'] as String;
+      final match = RegExp(r'Boda de (.+)').firstMatch(title);
+      if (match != null) {
+        _nameController.text = match.group(1) ?? '';
+      }
+    }
   }
 
   Future<void> _signUp() async {
@@ -55,6 +71,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           'full_name': _nameController.text.trim(),
           'email': _emailController.text.trim(),
         });
+
+        // Auto-create wedding with onboarding data if available
+        final data = widget.onboardingData;
+        if (data != null) {
+          final weddingDate = data['wedding_date'] != null
+              ? DateTime.parse(data['wedding_date']).toIso8601String().split('T').first
+              : DateTime.now().add(const Duration(days: 180)).toIso8601String().split('T').first;
+
+          await Supabase.instance.client.rpc('create_self_wedding', params: {
+            'p_title': data['wedding_title'] ?? 'Mi boda',
+            'p_wedding_date': weddingDate,
+            'p_venue': null,
+            'p_budget': 15000,
+          });
+        }
 
         if (mounted) context.go('/');
       }
@@ -97,12 +128,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Créer un compte',
+                      'Crear cuenta',
                       style: Theme.of(context).textTheme.headlineLarge,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Commencez à organiser votre mariage de rêve',
+                      'Comienza a organizar la boda de tus sueños',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 24),
@@ -112,12 +143,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textCapitalization: TextCapitalization.words,
                   autofillHints: const [AutofillHints.name],
                   decoration: const InputDecoration(
-                    labelText: 'Nom complet',
-                    hintText: 'Marie & Pierre',
+                    labelText: 'Nombre completo',
+                    hintText: 'María y Pedro',
                     prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Nom requis';
+                    if (v == null || v.isEmpty) return 'Nombre requerido';
                     return null;
                   },
                 ),
@@ -128,13 +159,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
                   decoration: const InputDecoration(
-                    labelText: 'Adresse e-mail',
+                    labelText: 'Correo electrónico',
                     hintText: 'tu@email.com',
                     prefixIcon: Icon(Icons.mail_outline_rounded, size: 20),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'E-mail requis';
-                    if (!v.contains('@')) return 'E-mail invalide';
+                    if (v == null || v.isEmpty) return 'Correo requerido';
+                    if (!v.contains('@')) return 'Correo inválido';
                     return null;
                   },
                 ),
@@ -145,7 +176,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   obscureText: _obscurePassword,
                   autofillHints: const [AutofillHints.newPassword],
                   decoration: InputDecoration(
-                    labelText: 'Mot de passe',
+                    labelText: 'Contraseña',
                     prefixIcon:
                         const Icon(Icons.lock_outline_rounded, size: 20),
                     suffixIcon: IconButton(
@@ -161,7 +192,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (v) {
                     if (v == null || v.length < 6) {
-                      return '6 caractères minimum';
+                      return 'Mínimo 6 caracteres';
                     }
                     return null;
                   },
@@ -181,7 +212,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Créer mon compte'),
+                        : const Text('Crear mi cuenta'),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -190,13 +221,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Déjà un compte ? ',
+                      '¿Ya tienes cuenta? ',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     GestureDetector(
                       onTap: () => context.go('/login'),
                       child: Text(
-                        'Se connecter',
+                        'Iniciar sesión',
                         style: TextStyle(
                           color: AppTheme.primary,
                           fontWeight: FontWeight.w600,

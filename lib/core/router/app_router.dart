@@ -36,7 +36,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/splash', builder: (_, _) => const SplashScreen()),
       GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
-      GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
+      GoRoute(path: '/register', builder: (_, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return RegisterScreen(onboardingData: extra);
+      }),
       ShellRoute(
         builder: (context, state, child) => HomeScreen(child: child),
         routes: [

@@ -67,12 +67,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Bon retour !',
+                      '¡Bienvenido de vuelta!',
                       style: Theme.of(context).textTheme.headlineLarge,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Connectez-vous pour accéder à votre mariage',
+                      'Inicia sesión para acceder a tu boda',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 32),
@@ -82,13 +82,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       keyboardType: TextInputType.emailAddress,
                       autofillHints: const [AutofillHints.email],
                       decoration: const InputDecoration(
-                        labelText: 'Adresse e-mail',
-                        hintText: 'vous@email.com',
+                        labelText: 'Correo electrónico',
+                        hintText: 'tu@email.com',
                         prefixIcon: Icon(Icons.mail_outline_rounded, size: 20),
                       ),
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'E-mail requis';
-                        if (!v.contains('@')) return 'E-mail invalide';
+                        if (v == null || v.isEmpty) return 'Correo requerido';
+                        if (!v.contains('@')) return 'Correo inválido';
                         return null;
                       },
                     ),
@@ -99,7 +99,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       obscureText: _obscurePassword,
                       autofillHints: const [AutofillHints.password],
                       decoration: InputDecoration(
-                        labelText: 'Mot de passe',
+                        labelText: 'Contraseña',
                         prefixIcon:
                             const Icon(Icons.lock_outline_rounded, size: 20),
                         suffixIcon: IconButton(
@@ -115,7 +115,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       validator: (v) {
                         if (v == null || v.length < 6) {
-                          return '6 caractères minimum';
+                          return 'Mínimo 6 caracteres';
                         }
                         return null;
                       },
@@ -127,7 +127,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         onPressed: () {
                           // TODO: password reset
                         },
-                        child: const Text('Mot de passe oublié ?'),
+                        child: const Text('¿Olvidaste tu contraseña?'),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -145,7 +145,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text('Se connecter'),
+                            : const Text('Iniciar sesión'),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -154,13 +154,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Pas encore de compte ? ',
+                          '¿No tienes cuenta? ',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         GestureDetector(
                           onTap: () => context.go('/register'),
                           child: Text(
-                            'Créer un compte',
+                            'Crear cuenta',
                             style: TextStyle(
                               color: AppTheme.primary,
                               fontWeight: FontWeight.w600,

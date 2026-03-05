@@ -7,20 +7,20 @@ import '../../../core/theme/app_theme.dart';
 import '../../wedding/data/wedding_providers.dart';
 
 const _defaultTimelineSeed = [
-  {'title': 'Cérémonie civile', 'event_time': '10:00:00', 'location': 'Mairie', 'category': 'Cérémonie', 'sort_order': 0},
-  {'title': 'Cérémonie religieuse', 'event_time': '14:00:00', 'location': 'Église', 'category': 'Cérémonie', 'sort_order': 1},
-  {'title': 'Cocktail', 'event_time': '16:00:00', 'location': 'Jardin du château', 'category': 'Réception', 'sort_order': 2},
-  {'title': 'Photos de groupe', 'event_time': '17:00:00', 'location': 'Parc', 'category': 'Photos', 'sort_order': 3},
-  {'title': 'Dîner', 'event_time': '19:30:00', 'location': 'Salle de réception', 'category': 'Réception', 'sort_order': 4},
-  {'title': 'Première danse', 'event_time': '22:00:00', 'location': 'Piste de danse', 'category': 'Soirée', 'sort_order': 5},
-  {'title': 'Soirée dansante', 'event_time': '22:30:00', 'location': 'Salle de réception', 'category': 'Soirée', 'sort_order': 6},
+  {'title': 'Ceremonia civil', 'event_time': '10:00:00', 'location': 'Registro Civil', 'category': 'Ceremonia', 'sort_order': 0},
+  {'title': 'Ceremonia religiosa', 'event_time': '14:00:00', 'location': 'Iglesia', 'category': 'Ceremonia', 'sort_order': 1},
+  {'title': 'Cóctel', 'event_time': '16:00:00', 'location': 'Jardín del salón', 'category': 'Recepción', 'sort_order': 2},
+  {'title': 'Fotos de grupo', 'event_time': '17:00:00', 'location': 'Parque', 'category': 'Fotos', 'sort_order': 3},
+  {'title': 'Cena', 'event_time': '19:30:00', 'location': 'Salón de recepciones', 'category': 'Recepción', 'sort_order': 4},
+  {'title': 'Primer baile', 'event_time': '22:00:00', 'location': 'Pista de baile', 'category': 'Fiesta', 'sort_order': 5},
+  {'title': 'Fiesta bailable', 'event_time': '22:30:00', 'location': 'Salón de recepciones', 'category': 'Fiesta', 'sort_order': 6},
 ];
 
 const _categoryIcons = <String, IconData>{
-  'Cérémonie': Icons.church_rounded,
-  'Réception': Icons.restaurant_rounded,
-  'Photos': Icons.camera_alt_rounded,
-  'Soirée': Icons.nightlife_rounded,
+  'Ceremonia': Icons.church_rounded,
+  'Recepción': Icons.restaurant_rounded,
+  'Fotos': Icons.camera_alt_rounded,
+  'Fiesta': Icons.nightlife_rounded,
 };
 
 class TimelineScreen extends ConsumerStatefulWidget {
@@ -58,7 +58,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('Planning'),
+        title: const Text('Agenda'),
         centerTitle: false,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -74,7 +74,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                 firstDay: DateTime.utc(2024, 1, 1),
                 lastDay: DateTime.utc(2030, 12, 31),
                 focusedDay: _focusedDay,
-                locale: 'fr_FR',
+                locale: 'es_MX',
                 calendarFormat: _calendarFormat,
                 onFormatChanged: (format) =>
                     setState(() => _calendarFormat = format),
@@ -115,7 +115,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'Programme du grand jour',
+                'Programa del gran día',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),

@@ -7,18 +7,18 @@ import '../../../core/theme/app_theme.dart';
 import '../../wedding/data/wedding_providers.dart';
 
 const _defaultBudgetSeed = [
-  {'name': 'Location de la salle', 'category': 'Lieu', 'estimated_cost': 5000, 'sort_order': 0},
-  {'name': 'Hébergement', 'category': 'Lieu', 'estimated_cost': 1500, 'sort_order': 1},
-  {'name': 'Repas et boissons', 'category': 'Traiteur', 'estimated_cost': 8000, 'sort_order': 2},
-  {'name': 'Gâteau', 'category': 'Traiteur', 'estimated_cost': 500, 'sort_order': 3},
-  {'name': 'Robe / Costume', 'category': 'Tenue', 'estimated_cost': 2000, 'sort_order': 4},
-  {'name': 'Alliances', 'category': 'Tenue', 'estimated_cost': 1000, 'sort_order': 5},
-  {'name': 'Fleurs et décoration', 'category': 'Décoration', 'estimated_cost': 2000, 'sort_order': 6},
-  {'name': 'DJ / Groupe musical', 'category': 'Musique', 'estimated_cost': 1500, 'sort_order': 7},
-  {'name': 'Photographe', 'category': 'Photo', 'estimated_cost': 1800, 'sort_order': 8},
-  {'name': 'Vidéaste', 'category': 'Photo', 'estimated_cost': 1200, 'sort_order': 9},
-  {'name': 'Faire-part', 'category': 'Divers', 'estimated_cost': 300, 'sort_order': 10},
-  {'name': 'Cadeaux invités', 'category': 'Divers', 'estimated_cost': 400, 'sort_order': 11},
+  {'name': 'Renta del salón', 'category': 'Lugar', 'estimated_cost': 5000, 'sort_order': 0},
+  {'name': 'Hospedaje', 'category': 'Lugar', 'estimated_cost': 1500, 'sort_order': 1},
+  {'name': 'Comida y bebidas', 'category': 'Banquete', 'estimated_cost': 8000, 'sort_order': 2},
+  {'name': 'Pastel', 'category': 'Banquete', 'estimated_cost': 500, 'sort_order': 3},
+  {'name': 'Vestido / Traje', 'category': 'Vestuario', 'estimated_cost': 2000, 'sort_order': 4},
+  {'name': 'Anillos', 'category': 'Vestuario', 'estimated_cost': 1000, 'sort_order': 5},
+  {'name': 'Flores y decoración', 'category': 'Decoración', 'estimated_cost': 2000, 'sort_order': 6},
+  {'name': 'DJ / Grupo musical', 'category': 'Música', 'estimated_cost': 1500, 'sort_order': 7},
+  {'name': 'Fotógrafo', 'category': 'Foto', 'estimated_cost': 1800, 'sort_order': 8},
+  {'name': 'Videógrafo', 'category': 'Foto', 'estimated_cost': 1200, 'sort_order': 9},
+  {'name': 'Invitaciones', 'category': 'Varios', 'estimated_cost': 300, 'sort_order': 10},
+  {'name': 'Recuerdos para invitados', 'category': 'Varios', 'estimated_cost': 400, 'sort_order': 11},
 ];
 
 class BudgetScreen extends ConsumerStatefulWidget {
@@ -29,7 +29,7 @@ class BudgetScreen extends ConsumerStatefulWidget {
 }
 
 class _BudgetScreenState extends ConsumerState<BudgetScreen> {
-  final _currencyFormat = NumberFormat.currency(locale: 'fr_FR', symbol: '€');
+  final _currencyFormat = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
   bool _seeded = false;
 
   Future<void> _seedDefaults(String weddingId) async {
@@ -56,7 +56,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('Budget'),
+        title: const Text('Presupuesto'),
         centerTitle: false,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -106,7 +106,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                   child: Column(
                     children: [
                       const Text(
-                        'Budget total',
+                        'Presupuesto total',
                         style: TextStyle(color: Colors.white70, fontSize: 14),
                       ),
                       const SizedBox(height: 4),
@@ -123,7 +123,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                         children: [
                           Expanded(
                             child: _SummaryCell(
-                              label: 'Dépensé',
+                              label: 'Gastado',
                               value: _currencyFormat.format(totalActual),
                               color: Colors.white,
                             ),
@@ -131,7 +131,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                           Container(width: 1, height: 30, color: Colors.white30),
                           Expanded(
                             child: _SummaryCell(
-                              label: 'Restant',
+                              label: 'Restante',
                               value: _currencyFormat.format(remaining),
                               color: remaining >= 0
                                   ? Colors.white
@@ -205,7 +205,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                               style: const TextStyle(fontSize: 14),
                             ),
                             subtitle: Text(
-                              'Estimé : ${_currencyFormat.format(estimated)}',
+                              'Estimado : ${_currencyFormat.format(estimated)}',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey.shade500,
@@ -213,7 +213,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                             ),
                             trailing: isPaid
                                 ? Chip(
-                                    label: const Text('Payé'),
+                                    label: const Text('Pagado'),
                                     backgroundColor:
                                         AppTheme.success.withOpacity(0.1),
                                     labelStyle: TextStyle(

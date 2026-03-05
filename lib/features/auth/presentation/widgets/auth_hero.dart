@@ -69,7 +69,7 @@ class AuthHero extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'My Wedding',
+                  'Mi Boda',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -79,7 +79,7 @@ class AuthHero extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Organisez le plus beau jour de votre vie',
+                  'Tu boda, simplificada',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.85),
                     fontSize: 14,

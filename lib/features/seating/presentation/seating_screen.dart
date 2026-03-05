@@ -16,7 +16,7 @@ class SeatingScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('Plan de table'),
+        title: const Text('Distribución de mesas'),
         centerTitle: false,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -28,9 +28,9 @@ class SeatingScreen extends ConsumerWidget {
           if (tables.isEmpty) {
             return const EmptyState(
               icon: Icons.table_restaurant_rounded,
-              title: 'Aucune table',
+              title: 'Ninguna mesa',
               subtitle:
-                  'Le plan de table sera disponible depuis la version web',
+                  'La distribución de mesas estará disponible desde la versión web',
             );
           }
           return guestsAsync.when(
@@ -55,14 +55,14 @@ class SeatingScreen extends ConsumerWidget {
                         children: [
                           _SummaryItem(
                             icon: Icons.table_restaurant_rounded,
-                            label: 'Tables',
+                            label: 'Mesas',
                             value: '${tables.length}',
                             color: AppTheme.primary,
                           ),
                           const SizedBox(width: 24),
                           _SummaryItem(
                             icon: Icons.people_rounded,
-                            label: 'Invités placés',
+                            label: 'Invitados ubicados',
                             value:
                                 '${guests.where((g) => g['table_id'] != null).length} / ${guests.length}',
                             color: AppTheme.success,
@@ -109,14 +109,14 @@ class SeatingScreen extends ConsumerWidget {
                               ),
                             ),
                             title: Text(
-                              table['name'] ?? 'Table ${tables.indexOf(table) + 1}',
+                              table['name'] ?? 'Mesa ${tables.indexOf(table) + 1}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
                               ),
                             ),
                             subtitle: Text(
-                              '${tableGuests.length} / $capacity places',
+                              '${tableGuests.length} / $capacity lugares',
                               style: TextStyle(
                                 color: Colors.grey.shade500,
                                 fontSize: 13,
@@ -127,7 +127,7 @@ class SeatingScreen extends ConsumerWidget {
                                 const Padding(
                                   padding: EdgeInsets.all(16),
                                   child: Text(
-                                    'Aucun invité placé',
+                                    'Ningún invitado ubicado',
                                     style: TextStyle(
                                       color: Colors.grey,
                                       fontStyle: FontStyle.italic,
