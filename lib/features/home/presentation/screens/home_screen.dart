@@ -10,17 +10,16 @@ class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key, required this.child});
 
   static final _tabs = [
-    const _TabItem(icon: Icons.dashboard_rounded, label: 'Inicio', path: '/'),
-    const _TabItem(icon: Icons.checklist_rounded, label: 'Tareas', path: '/checklist'),
-    const _TabItem(icon: Icons.account_balance_wallet_rounded, label: 'Presupuesto', path: '/budget'),
-    const _TabItem(icon: Icons.people_rounded, label: 'Invitados', path: '/guests'),
-    const _TabItem(icon: Icons.calendar_month_rounded, label: 'Agenda', path: '/timeline'),
+    const _TabItem(icon: Icons.favorite_outline_rounded, activeIcon: Icons.favorite_rounded, label: 'Inicio', path: '/'),
+    const _TabItem(icon: Icons.checklist_rounded, activeIcon: Icons.checklist_rounded, label: 'Tareas', path: '/checklist'),
+    const _TabItem(icon: Icons.account_balance_wallet_outlined, activeIcon: Icons.account_balance_wallet_rounded, label: 'Presupuesto', path: '/budget'),
+    const _TabItem(icon: Icons.people_outline_rounded, activeIcon: Icons.people_rounded, label: 'Invitados', path: '/guests'),
   ];
 
   int _currentIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     for (int i = _tabs.length - 1; i >= 0; i--) {
-      if (location.startsWith(_tabs[i].path) && 
+      if (location.startsWith(_tabs[i].path) &&
           (_tabs[i].path == '/' ? location == '/' : true)) {
         return i;
       }
@@ -34,22 +33,49 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: index,
-        onDestinationSelected: (i) => context.go(_tabs[i].path),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 1,
-        indicatorColor: AppTheme.primary.withOpacity(0.1),
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        height: 65,
-        destinations: _tabs.map((tab) {
-          return NavigationDestination(
-            icon: Icon(tab.icon, color: Colors.grey.shade500),
-            selectedIcon: Icon(tab.icon, color: AppTheme.primary),
-            label: tab.label,
-          );
-        }).toList(),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(color: AppTheme.border.withOpacity(0.3)),
+          ),
+        ),
+        child: SafeArea(
+          child: SizedBox(
+            height: 52,
+            child: Row(
+              children: List.generate(_tabs.length, (i) {
+                final tab = _tabs[i];
+                final isActive = i == index;
+                return Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => context.go(tab.path),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isActive ? tab.activeIcon : tab.icon,
+                          size: 22,
+                          color: isActive ? AppTheme.primary : AppTheme.muted.withOpacity(0.4),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          tab.label,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                            color: isActive ? AppTheme.primary : AppTheme.muted.withOpacity(0.4),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -57,8 +83,9 @@ class HomeScreen extends ConsumerWidget {
 
 class _TabItem {
   final IconData icon;
+  final IconData activeIcon;
   final String label;
   final String path;
 
-  const _TabItem({required this.icon, required this.label, required this.path});
+  const _TabItem({required this.icon, required this.activeIcon, required this.label, required this.path});
 }

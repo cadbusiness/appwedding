@@ -4,8 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/providers/auth_providers.dart';
-import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../wedding/data/wedding_providers.dart';
 
@@ -15,11 +13,9 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final weddingAsync = ref.watch(weddingProvider);
-    final profile = ref.watch(userProfileProvider);
-    final guestStats = ref.watch(guestStatsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: weddingAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -45,11 +41,7 @@ class DashboardScreen extends ConsumerWidget {
             if (wedding == null) {
               return _NoWeddingView();
             }
-            return _WeddingDashboard(
-              wedding: wedding,
-              profileName: profile.value?['full_name'] ?? 'Pareja',
-              guestStats: guestStats,
-            );
+            return _WeddingDashboard(wedding: wedding);
           },
         ),
       ),
@@ -75,298 +67,171 @@ class _NoWeddingView extends StatelessWidget {
 
 class _WeddingDashboard extends StatelessWidget {
   final Map<String, dynamic> wedding;
-  final String profileName;
-  final Map<String, int> guestStats;
 
-  const _WeddingDashboard({
-    required this.wedding,
-    required this.profileName,
-    required this.guestStats,
-  });
+  const _WeddingDashboard({required this.wedding});
 
   @override
   Widget build(BuildContext context) {
-    // DB column is "wedding_date" not "date"
     final weddingDate = wedding['wedding_date'] != null
         ? DateTime.tryParse(wedding['wedding_date'].toString())
         : null;
     final daysLeft = weddingDate?.difference(DateTime.now()).inDays;
     final dateFormatted = weddingDate != null
         ? DateFormat('d MMMM yyyy', 'es_MX').format(weddingDate)
-        : 'Fecha no definida';
+        : null;
+    final venue = wedding['venue'] as String?;
 
-    return RefreshIndicator(
-      onRefresh: () async {},
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hola $profileName 💍',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        wedding['title'] ?? 'Mi boda',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => context.push('/profile'),
-                  child: CircleAvatar(
-                    radius: 22,
-                    backgroundColor: AppTheme.primary.withOpacity(0.1),
-                    child: Icon(
-                      Icons.person_rounded,
-                      color: AppTheme.primary,
-                      size: 22,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
+    final tools = <_ToolItem>[
+      _ToolItem(label: 'Checklist', icon: Icons.checklist_rounded, path: '/checklist'),
+      _ToolItem(label: 'Presupuesto', icon: Icons.account_balance_wallet_outlined, path: '/budget'),
+      _ToolItem(label: 'Invitados', icon: Icons.people_outline_rounded, path: '/guests'),
+      _ToolItem(label: 'Agenda del día', icon: Icons.calendar_today_rounded, path: '/timeline'),
+      _ToolItem(label: 'Asignación de mesas', icon: Icons.table_restaurant_outlined, path: '/seating'),
+      _ToolItem(label: 'Mi perfil', icon: Icons.person_outline_rounded, path: '/profile'),
+    ];
 
-            // Countdown Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppTheme.primary, AppTheme.primary.withOpacity(0.8)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primary.withOpacity(0.3),
-                    blurRadius: 16,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  const Icon(Icons.favorite_rounded, color: Colors.white, size: 32),
-                  const SizedBox(height: 12),
-                  if (daysLeft != null) ...[
-                    Text(
-                      '${daysLeft > 0 ? daysLeft : 0}',
-                      style: const TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        height: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      daysLeft > 0 ? 'días restantes' : '¡Llegó el gran día! 🎉',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white70,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 8),
-                  Text(
-                    dateFormatted,
-                    style: const TextStyle(fontSize: 14, color: Colors.white60),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Quick Stats
-            Row(
-              children: [
-                Expanded(
-                  child: _StatCard(
-                    icon: Icons.people_rounded,
-                    label: 'Invitados',
-                    value: '${guestStats['total']}',
-                    color: AppTheme.primary,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _StatCard(
-                    icon: Icons.check_circle_rounded,
-                    label: 'Confirmados',
-                    value: '${guestStats['confirmed']}',
-                    color: AppTheme.success,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _StatCard(
-                    icon: Icons.schedule_rounded,
-                    label: 'Pendientes',
-                    value: '${guestStats['pending']}',
-                    color: AppTheme.warning,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Quick Actions
-            Text('Herramientas', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 12),
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 1.4,
-              children: [
-                _QuickAction(
-                  icon: Icons.checklist_rounded,
-                  label: 'Checklist',
-                  subtitle: 'Tareas pendientes',
-                  color: const Color(0xFF6366F1),
-                  onTap: () => context.go('/checklist'),
-                ),
-                _QuickAction(
-                  icon: Icons.account_balance_wallet_rounded,
-                  label: 'Presupuesto',
-                  subtitle: 'Seguimiento de gastos',
-                  color: const Color(0xFF10B981),
-                  onTap: () => context.go('/budget'),
-                ),
-                _QuickAction(
-                  icon: Icons.people_rounded,
-                  label: 'Invitados',
-                  subtitle: 'Lista y confirmaciones',
-                  color: const Color(0xFFF59E0B),
-                  onTap: () => context.go('/guests'),
-                ),
-                _QuickAction(
-                  icon: Icons.table_restaurant_rounded,
-                  label: 'Asignación de mesas',
-                  subtitle: 'Ubicación',
-                  color: const Color(0xFFEC4899),
-                  onTap: () => context.push('/seating'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Venue info
-            if (wedding['venue'] != null) ...[
-              AppCard(
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(Icons.location_on_rounded, color: AppTheme.primary, size: 22),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Lugar de recepción', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                          Text(
-                            wedding['venue'],
-                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
-
-  const _StatCard({required this.icon, required this.label, required this.value, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade100),
-      ),
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: 6),
-          Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: color)),
-          Text(label, style: TextStyle(fontSize: 11, color: Colors.grey.shade500)),
+          const SizedBox(height: 24),
+
+          // ─── Title ───
+          Text(
+            wedding['title'] ?? 'Mi boda',
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.primary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          // ─── Countdown ───
+          if (daysLeft != null && daysLeft > 0) ...[
+            const SizedBox(height: 20),
+            Text(
+              '$daysLeft',
+              style: const TextStyle(
+                fontSize: 52,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.primary,
+                height: 1,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              daysLeft == 1 ? 'día restante' : 'días restantes',
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppTheme.muted,
+              ),
+            ),
+          ],
+          if (daysLeft != null && daysLeft <= 0)
+            const Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Text(
+                '¡Felicidades! 💍',
+                style: TextStyle(fontSize: 18, color: AppTheme.muted),
+              ),
+            ),
+
+          // ─── Date & Venue ───
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (dateFormatted != null) ...[
+                const Icon(Icons.calendar_today_rounded, size: 14, color: AppTheme.muted),
+                const SizedBox(width: 4),
+                Text(
+                  dateFormatted,
+                  style: const TextStyle(fontSize: 13, color: AppTheme.muted),
+                ),
+              ],
+              if (dateFormatted != null && venue != null)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Text('·', style: TextStyle(color: AppTheme.muted)),
+                ),
+              if (venue != null) ...[
+                const Icon(Icons.location_on_outlined, size: 14, color: AppTheme.muted),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    venue,
+                    style: const TextStyle(fontSize: 13, color: AppTheme.muted),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ],
+          ),
+
+          // ─── Tools list ───
+          const SizedBox(height: 36),
+          ...tools.map((tool) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: _ToolRow(tool: tool),
+          )),
         ],
       ),
     );
   }
 }
 
-class _QuickAction extends StatelessWidget {
-  final IconData icon;
+class _ToolItem {
   final String label;
-  final String subtitle;
-  final Color color;
-  final VoidCallback onTap;
+  final IconData icon;
+  final String path;
 
-  const _QuickAction({required this.icon, required this.label, required this.subtitle, required this.color, required this.onTap});
+  const _ToolItem({required this.label, required this.icon, required this.path});
+}
+
+class _ToolRow extends StatelessWidget {
+  final _ToolItem tool;
+
+  const _ToolRow({required this.tool});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        if (tool.path == '/seating' || tool.path == '/profile') {
+          context.push(tool.path);
+        } else {
+          context.go(tool.path);
+        }
+      },
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade100),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppTheme.border.withOpacity(0.5)),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Row(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-              child: Icon(icon, color: color, size: 20),
+            Icon(tool.icon, size: 20, color: AppTheme.muted),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                tool.label,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.primary,
+                ),
+              ),
             ),
-            const SizedBox(height: 10),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-            Text(subtitle, style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+              color: Colors.grey.shade300,
+            ),
           ],
         ),
       ),
