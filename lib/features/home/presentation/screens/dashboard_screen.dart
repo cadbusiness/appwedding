@@ -59,7 +59,19 @@ class _WeddingDashboard extends StatelessWidget {
         ? DateTime.tryParse(wedding['wedding_date'].toString())
         : null;
     final daysLeft = weddingDate?.difference(DateTime.now()).inDays;
-    // Removed unused formattedDate and venue for this version
+    
+    // Style Mapping for dynamic background
+    final styleImages = {
+      'clasico': 'https://images.unsplash.com/photo-1519225421980-715cb0202128?q=80&w=1000&auto=format&fit=crop', // Elegant ballroom
+      'boho': 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=1000&auto=format&fit=crop', // Boho chic outdoors
+      'moderno': 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1000&auto=format&fit=crop', // Minimalist clean
+      'rustico': 'https://images.unsplash.com/photo-1510076857177-7470076d4098?q=80&w=1000&auto=format&fit=crop', // Rustic barn/wood
+      'playa': 'https://images.unsplash.com/photo-1544207240-8b10b5ebd4a6?q=80&w=1000&auto=format&fit=crop', // Beach sunset
+      'romantico': 'https://images.unsplash.com/photo-1520854221256-17451cc330e7?q=80&w=1000&auto=format&fit=crop', // Flowers & candles
+    };
+
+    final weddingStyle = wedding['style'] as String?;
+    final bgImage = styleImages[weddingStyle];
 
     final tools = <_ToolItem>[
       _ToolItem(label: 'Checklist', icon: Icons.playlist_add_check_circle_outlined, path: '/checklist', color: const Color(0xFF7B8FA1)),
@@ -73,89 +85,100 @@ class _WeddingDashboard extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
-          expandedHeight: 280.0,
+          expandedHeight: 200.0, // Reduced height
           floating: false,
           pinned: true,
-          backgroundColor: Colors.transparent,
+          backgroundColor: const Color(0xFF1A1A1A), // Darker fallback
           elevation: 0,
           flexibleSpace: FlexibleSpaceBar(
             background: Stack(
               fit: StackFit.expand,
               children: [
-                // Image de fond élégante
-                CachedNetworkImage(
-                  imageUrl: "https://images.unsplash.com/photo-1519225421980-715cb0202128?q=80&w=1000&auto=format&fit=crop",
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(color: Colors.grey[200]),
-                  errorWidget: (context, url, error) => Container(color: Colors.grey[200]),
-                ),
-                // Overlay gradient pour la lisibilité
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withOpacity(0.1),
-                        Colors.black.withOpacity(0.5),
-                      ],
+                if (bgImage != null)
+                  CachedNetworkImage(
+                    imageUrl: bgImage,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(color: const Color(0xFF1A1A1A)),
+                    errorWidget: (context, url, error) => Container(color: const Color(0xFF1A1A1A)),
+                  )
+                else
+                  Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF2C3E50), Color(0xFF000000)], // Dark elegant gradient if no image
+                      ),
                     ),
                   ),
+                
+                // Dark overlay to ensure text legibility
+                Container(
+                  color: Colors.black.withOpacity(0.4), 
                 ),
-                // Contenu du Header
+
+                // Content
                 Positioned(
-                  bottom: 40,
+                  bottom: 24, // Adjusted for smaller header
                   left: 20,
                   right: 20,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(
-                        'Boda de',
-                        style: GoogleFonts.montserrat(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 2.0,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Boda de',
+                              style: GoogleFonts.montserrat(
+                                color: Colors.white70,
+                                fontSize: 11, // Smaller
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              wedding['title'] ?? 'Nuestra Boda',
+                              style: GoogleFonts.playfairDisplay(
+                                color: Colors.white,
+                                fontSize: 24, // Smaller title
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        wedding['title'] ?? 'Nuestra Boda',
-                        style: GoogleFonts.playfairDisplay(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
                       if (daysLeft != null && daysLeft > 0)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(color: Colors.white.withOpacity(0.3)),
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white.withOpacity(0.2)),
                           ),
-                          child: Row(
+                          child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 '$daysLeft',
                                 style: GoogleFonts.cormorantGaramond(
                                   color: Colors.white,
-                                  fontSize: 24,
+                                  fontSize: 20, // Smaller
                                   fontWeight: FontWeight.bold,
+                                  height: 1.0,
                                 ),
                               ),
-                              const SizedBox(width: 6),
                               Text(
-                                daysLeft == 1 ? 'DÍA RESTANTE' : 'DÍAS RESTANTES',
+                                daysLeft == 1 ? 'día' : 'días',
                                 style: GoogleFonts.montserrat(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 1.0,
+                                  color: Colors.white70,
+                                  fontSize: 9, 
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
@@ -172,34 +195,34 @@ class _WeddingDashboard extends StatelessWidget {
         SliverToBoxAdapter(
           child: Container(
             decoration: const BoxDecoration(
-              color: Color(0xFFF5F5F0), // Doit matcher le Scaffold backgroundColor
+              color: Color(0xFFF5F5F0), 
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(32),
-                topRight: Radius.circular(32),
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
               ),
             ),
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(20), // Reduced pairing
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Herramientas',
                   style: GoogleFonts.playfairDisplay(
-                    fontSize: 24,
+                    fontSize: 20, // Smaller section title
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF2C3E50),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 GridView.builder(
                   padding: EdgeInsets.zero,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 1.0,
+                    crossAxisSpacing: 12, // Reduced spacing
+                    mainAxisSpacing: 12, // Reduced spacing
+                    childAspectRatio: 1.25, // More rectangular (smaller height)
                   ),
                   itemCount: tools.length,
                   itemBuilder: (context, index) {
