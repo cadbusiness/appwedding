@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,7 +18,7 @@ class DashboardScreen extends ConsumerWidget {
     final weddingAsync = ref.watch(weddingProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F0), // Fond légèrement crème/gris très doux
+      backgroundColor: AppTheme.background, // Use global theme background
       body: weddingAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
@@ -60,68 +61,68 @@ class _WeddingDashboard extends StatelessWidget {
         : null;
     final daysLeft = weddingDate?.difference(DateTime.now()).inDays;
     
-    // Style Mapping for dynamic background
+    // Style Mapping for dynamic background (local assets)
     final styleImages = {
-      'clasico': 'https://images.unsplash.com/photo-1519225421980-715cb0202128?q=80&w=1000&auto=format&fit=crop', // Elegant ballroom
-      'boho': 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=1000&auto=format&fit=crop', // Boho chic outdoors
-      'moderno': 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1000&auto=format&fit=crop', // Minimalist clean
-      'rustico': 'https://images.unsplash.com/photo-1510076857177-7470076d4098?q=80&w=1000&auto=format&fit=crop', // Rustic barn/wood
-      'playa': 'https://images.unsplash.com/photo-1544207240-8b10b5ebd4a6?q=80&w=1000&auto=format&fit=crop', // Beach sunset
-      'romantico': 'https://images.unsplash.com/photo-1520854221256-17451cc330e7?q=80&w=1000&auto=format&fit=crop', // Flowers & candles
+      'clasico': 'assets/images/dashboard_bg_clasico.jpg',
+      'boho': 'assets/images/dashboard_bg_boho.jpg',
+      'moderno': 'assets/images/dashboard_bg_moderno.jpg',
+      'rustico': 'assets/images/dashboard_bg_rustico.jpg',
+      'playa': 'assets/images/dashboard_bg_playa.jpg',
+      'romantico': 'assets/images/dashboard_bg_romantico.jpg',
     };
 
     final weddingStyle = wedding['style'] as String?;
-    final bgImage = styleImages[weddingStyle];
+    final bgImage = styleImages[weddingStyle] ?? 'assets/images/dashboard_bg_default.jpg'; 
 
     final tools = <_ToolItem>[
-      _ToolItem(label: 'Checklist', icon: Icons.playlist_add_check_circle_outlined, path: '/checklist', color: const Color(0xFF7B8FA1)),
-      _ToolItem(label: 'Presupuesto', icon: Icons.account_balance_wallet_outlined, path: '/budget', color: const Color(0xFFD4A373)),
-      _ToolItem(label: 'Invitados', icon: Icons.people_outline_rounded, path: '/guests', color: const Color(0xFF90A17D)),
-      _ToolItem(label: 'Agenda', icon: Icons.calendar_today_rounded, path: '/timeline', color: const Color(0xFFA5A58D)),
-      _ToolItem(label: 'Mesas', icon: Icons.table_restaurant_outlined, path: '/seating', color: const Color(0xFFB7B7A4)),
-      _ToolItem(label: 'Perfil', icon: Icons.person_outline_rounded, path: '/profile', color: const Color(0xFF6B705C)),
+      _ToolItem(label: 'Checklist', icon: CupertinoIcons.check_mark_circled, path: '/checklist', color: const Color(0xFFD4A574)), // Gold
+      _ToolItem(label: 'Presupuesto', icon: CupertinoIcons.money_dollar_circle, path: '/budget', color: const Color(0xFFE5A9A9)), // Soft Pink
+      _ToolItem(label: 'Invitados', icon: CupertinoIcons.person_2, path: '/guests', color: const Color(0xFFA7C4BC)), // Sage
+      _ToolItem(label: 'Agenda', icon: CupertinoIcons.calendar, path: '/timeline', color: const Color(0xFFDFD3C3)), // Cream/Beige
+      _ToolItem(label: 'Mesas', icon: CupertinoIcons.square_grid_2x2, path: '/seating', color: const Color(0xFF9FA0C3)), // Lavender
+      _ToolItem(label: 'Perfil', icon: CupertinoIcons.person_crop_circle, path: '/profile', color: const Color(0xFF8D8D8D)), // Grey
     ];
 
     return CustomScrollView(
       slivers: [
         SliverAppBar(
-          expandedHeight: 200.0, // Reduced height
+          expandedHeight: 180.0, // Reduced height
           floating: false,
           pinned: true,
-          backgroundColor: const Color(0xFF1A1A1A), // Darker fallback
+          backgroundColor: const Color(0xFFD4A574), // Gold fallback
           elevation: 0,
           flexibleSpace: FlexibleSpaceBar(
             background: Stack(
               fit: StackFit.expand,
               children: [
-                if (bgImage != null)
-                  CachedNetworkImage(
-                    imageUrl: bgImage,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(color: const Color(0xFF1A1A1A)),
-                    errorWidget: (context, url, error) => Container(color: const Color(0xFF1A1A1A)),
-                  )
-                else
-                  Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFF2C3E50), Color(0xFF000000)], // Dark elegant gradient if no image
-                      ),
+                Image.asset(
+                  bgImage,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: const Color(0xFFD4A574).withOpacity(0.3), // Fallback color if image not found
+                    child: const Center(child: Icon(CupertinoIcons.heart_fill, color: Colors.white)),
+                  ),
+                ),
+                
+                // Warm overlay instead of black
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.0),
+                        Colors.black.withOpacity(0.3),
+                      ],
                     ),
                   ),
-                
-                // Dark overlay to ensure text legibility
-                Container(
-                  color: Colors.black.withOpacity(0.4), 
                 ),
 
                 // Content
                 Positioned(
-                  bottom: 24, // Adjusted for smaller header
-                  left: 20,
-                  right: 20,
+                  bottom: 20, // Adjusted for smaller header
+                  left: 24,
+                  right: 24,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -133,10 +134,11 @@ class _WeddingDashboard extends StatelessWidget {
                             Text(
                               'Boda de',
                               style: GoogleFonts.montserrat(
-                                color: Colors.white70,
-                                fontSize: 11, // Smaller
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 1.5,
+                                color: Colors.white,
+                                fontSize: 12, // Smaller
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1.2,
+                                shadows: [const Shadow(offset: Offset(0, 1), blurRadius: 2, color: Colors.black26)],
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -144,8 +146,9 @@ class _WeddingDashboard extends StatelessWidget {
                               wedding['title'] ?? 'Nuestra Boda',
                               style: GoogleFonts.playfairDisplay(
                                 color: Colors.white,
-                                fontSize: 24, // Smaller title
-                                fontWeight: FontWeight.bold,
+                                fontSize: 28, // Smaller title
+                                fontWeight: FontWeight.w700,
+                                shadows: [const Shadow(offset: Offset(0, 1), blurRadius: 4, color: Colors.black26)],
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -155,11 +158,11 @@ class _WeddingDashboard extends StatelessWidget {
                       ),
                       if (daysLeft != null && daysLeft > 0)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white.withOpacity(0.2)),
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
                           ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -168,7 +171,7 @@ class _WeddingDashboard extends StatelessWidget {
                                 '$daysLeft',
                                 style: GoogleFonts.cormorantGaramond(
                                   color: Colors.white,
-                                  fontSize: 20, // Smaller
+                                  fontSize: 22, // Smaller
                                   fontWeight: FontWeight.bold,
                                   height: 1.0,
                                 ),
@@ -176,9 +179,9 @@ class _WeddingDashboard extends StatelessWidget {
                               Text(
                                 daysLeft == 1 ? 'día' : 'días',
                                 style: GoogleFonts.montserrat(
-                                  color: Colors.white70,
-                                  fontSize: 9, 
-                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                  fontSize: 10, 
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
@@ -195,42 +198,27 @@ class _WeddingDashboard extends StatelessWidget {
         SliverToBoxAdapter(
           child: Container(
             decoration: const BoxDecoration(
-              color: Color(0xFFF5F5F0), 
+              color: AppTheme.background, 
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(24),
                 topRight: Radius.circular(24),
               ),
             ),
-            padding: const EdgeInsets.all(20), // Reduced pairing
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Herramientas',
-                  style: GoogleFonts.playfairDisplay(
-                    fontSize: 20, // Smaller section title
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF2C3E50),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                GridView.builder(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12, // Reduced spacing
-                    mainAxisSpacing: 12, // Reduced spacing
-                    childAspectRatio: 1.25, // More rectangular (smaller height)
-                  ),
-                  itemCount: tools.length,
-                  itemBuilder: (context, index) {
-                    return _ToolCard(tool: tools[index]);
-                  },
-                ),
-                const SizedBox(height: 40),
-              ],
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 40), // Reduced pairing
+            child: GridView.builder( // Directly the grid, removed "Herramientas" title to be more minimalist
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12, // Reduced spacing
+                mainAxisSpacing: 12, // Reduced spacing
+                childAspectRatio: 1.4, // More rectangular (smaller height)
+              ),
+              itemCount: tools.length,
+              itemBuilder: (context, index) {
+                return _ToolCard(tool: tools[index]);
+              },
             ),
           ),
         ),
@@ -271,37 +259,31 @@ class _ToolCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(16), // Less rounded, more modern/minimal
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.08),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
+              color: Colors.grey.withOpacity(0.05), // Extremely subtle shadow
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: tool.color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                tool.icon,
-                size: 28,
-                color: tool.color,
-              ),
+            Icon(
+              tool.icon,
+              size: 26, // Smaller icon
+              color: tool.color,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10), // Reduced spacing
             Text(
               tool.label,
               style: GoogleFonts.montserrat(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF2C3E50),
+                fontSize: 13, // Smaller text
+                fontWeight: FontWeight.w500, // Regular weight
+                color: const Color(0xFF4A4A4A), // Softer than black
+                letterSpacing: 0.5,
               ),
               textAlign: TextAlign.center,
             ),
