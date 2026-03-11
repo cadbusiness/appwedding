@@ -127,18 +127,37 @@ class ChecklistScreen extends ConsumerStatefulWidget {
 
 class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
   bool _seeded = false;
+  bool _seeding = false;
 
   Future<void> _seedDefaults(String weddingId) async {
-    if (_seeded) return;
-    _seeded = true;
-    final supabase = ref.read(supabaseProvider);
-    final rows = _defaultSeedItems
-        .map(
-          (item) => {...item, 'wedding_id': weddingId, 'is_completed': false},
-        )
-        .toList();
-    await supabase.from('wedding_checklist_items').insert(rows);
-    ref.invalidate(weddingChecklistProvider);
+    if (_seeded || _seeding) return;
+    _seeding = true;
+    try {
+      final supabase = ref.read(supabaseProvider);
+      // Check if items already exist
+      final existing = await supabase
+          .from('wedding_checklist_items')
+          .select('id')
+          .eq('wedding_id', weddingId)
+          .limit(1);
+      if ((existing as List).isNotEmpty) {
+        _seeded = true;
+        _seeding = false;
+        return;
+      }
+      final rows = _defaultSeedItems
+          .map(
+            (item) => {...item, 'wedding_id': weddingId, 'is_completed': false},
+          )
+          .toList();
+      await supabase.from('wedding_checklist_items').insert(rows);
+      _seeded = true;
+      ref.invalidate(weddingChecklistProvider);
+    } catch (_) {
+      _seeded = true; // Don't retry endlessly
+    } finally {
+      _seeding = false;
+    }
   }
 
   Future<void> _toggleItem(String id, bool current) async {

@@ -260,6 +260,7 @@ class BudgetScreen extends ConsumerStatefulWidget {
 class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   final _currencyFormat = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
   bool _seeded = false;
+  bool _seeding = false;
   String? _activeSegment;
   bool _editingBudget = false;
   final _budgetController = TextEditingController();
@@ -279,31 +280,49 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
       );
 
   Future<void> _seedDefaults(String weddingId) async {
-    if (_seeded) return;
-    _seeded = true;
-    final supabase = ref.read(supabaseProvider);
+    if (_seeded || _seeding) return;
+    _seeding = true;
+    try {
+      final supabase = ref.read(supabaseProvider);
+      // Check if items already exist
+      final existing = await supabase
+          .from('wedding_budget_items')
+          .select('id')
+          .eq('wedding_id', weddingId)
+          .limit(1);
+      if ((existing as List).isNotEmpty) {
+        _seeded = true;
+        _seeding = false;
+        return;
+      }
 
-    // Seed segments
-    final segRows = _defaultSegments
-        .map((s) => {...s, 'wedding_id': weddingId})
-        .toList();
-    await supabase.from('wedding_budget_segments').insert(segRows);
+      // Seed segments
+      final segRows = _defaultSegments
+          .map((s) => {...s, 'wedding_id': weddingId})
+          .toList();
+      await supabase.from('wedding_budget_segments').insert(segRows);
 
-    // Seed items
-    final itemRows = _defaultBudgetSeed
-        .map(
-          (item) => {
-            ...item,
-            'wedding_id': weddingId,
-            'actual_cost': 0,
-            'is_paid': false,
-          },
-        )
-        .toList();
-    await supabase.from('wedding_budget_items').insert(itemRows);
+      // Seed items
+      final itemRows = _defaultBudgetSeed
+          .map(
+            (item) => {
+              ...item,
+              'wedding_id': weddingId,
+              'actual_cost': 0,
+              'is_paid': false,
+            },
+          )
+          .toList();
+      await supabase.from('wedding_budget_items').insert(itemRows);
 
-    ref.invalidate(weddingBudgetProvider);
-    ref.invalidate(budgetSegmentsProvider);
+      _seeded = true;
+      ref.invalidate(weddingBudgetProvider);
+      ref.invalidate(budgetSegmentsProvider);
+    } catch (_) {
+      _seeded = true; // Don't retry endlessly
+    } finally {
+      _seeding = false;
+    }
   }
 
   Future<void> _updateGlobalBudget(String weddingId, double amount) async {

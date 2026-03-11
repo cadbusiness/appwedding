@@ -587,12 +587,12 @@ class _StylePage extends StatelessWidget {
   const _StylePage({required this.selected, required this.onSelected});
 
   static const _styles = [
-    _WeddingStyle(id: 'clasico', emoji: '🏛️', label: 'Clásico', desc: 'Elegante y atemporal'),
-    _WeddingStyle(id: 'boho', emoji: '🌿', label: 'Boho', desc: 'Natural y relajado'),
-    _WeddingStyle(id: 'moderno', emoji: '✨', label: 'Moderno', desc: 'Minimalista y chic'),
-    _WeddingStyle(id: 'rustico', emoji: '🌾', label: 'Rústico', desc: 'Campo y calidez'),
-    _WeddingStyle(id: 'playa', emoji: '🏖️', label: 'Playa', desc: 'Arena, sol y mar'),
-    _WeddingStyle(id: 'romantico', emoji: '🌹', label: 'Romántico', desc: 'Flores y velas'),
+    _WeddingStyle(id: 'clasico', emoji: '🏛️', label: 'Clásico', desc: 'Elegante y atemporal', image: 'assets/images/dashboard_bg_clasico.jpg'),
+    _WeddingStyle(id: 'boho', emoji: '🌿', label: 'Boho', desc: 'Natural y relajado', image: 'assets/images/dashboard_bg_boho.jpg'),
+    _WeddingStyle(id: 'moderno', emoji: '✨', label: 'Moderno', desc: 'Minimalista y chic', image: 'assets/images/dashboard_bg_moderno.jpg'),
+    _WeddingStyle(id: 'rustico', emoji: '🌾', label: 'Rústico', desc: 'Campo y calidez', image: 'assets/images/dashboard_bg_rustico.jpg'),
+    _WeddingStyle(id: 'playa', emoji: '🏖️', label: 'Playa', desc: 'Arena, sol y mar', image: 'assets/images/dashboard_bg_playa.jpg'),
+    _WeddingStyle(id: 'romantico', emoji: '🌹', label: 'Romántico', desc: 'Flores y velas', image: 'assets/images/dashboard_bg_romantico.jpg'),
   ];
 
   @override
@@ -611,25 +611,83 @@ class _StylePage extends StatelessWidget {
           Text('Elige el estilo que más te represente', style: TextStyle(color: Colors.grey.shade500, fontSize: 15)),
           const SizedBox(height: 28),
           GridView.count(crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.3,
+            mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.1,
             children: _styles.map((style) {
               final isSelected = selected == style.id;
               return GestureDetector(
                 onTap: () { HapticFeedback.lightImpact(); onSelected(style.id); },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
+                  clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    color: isSelected ? AppTheme.primary.withOpacity(0.08) : Colors.grey.shade50,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: isSelected ? AppTheme.primary : Colors.grey.shade200, width: isSelected ? 2 : 1)),
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text(style.emoji, style: const TextStyle(fontSize: 32)),
-                    const SizedBox(height: 8),
-                    Text(style.label, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15,
-                      color: isSelected ? AppTheme.primary : Colors.black87)),
-                    const SizedBox(height: 2),
-                    Text(style.desc, style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
-                  ]),
+                    border: Border.all(
+                      color: isSelected ? AppTheme.primary : Colors.grey.shade200,
+                      width: isSelected ? 2.5 : 1,
+                    ),
+                    boxShadow: isSelected ? [
+                      BoxShadow(color: AppTheme.primary.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 2)),
+                    ] : null,
+                  ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Background image
+                      Image.asset(
+                        style.image,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: Colors.grey.shade100,
+                          child: Center(child: Text(style.emoji, style: const TextStyle(fontSize: 32))),
+                        ),
+                      ),
+                      // Gradient overlay for text readability
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.0),
+                              Colors.black.withOpacity(0.55),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Selected check
+                      if (isSelected)
+                        Positioned(
+                          top: 8, right: 8,
+                          child: Container(
+                            width: 24, height: 24,
+                            decoration: BoxDecoration(
+                              color: AppTheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.check, color: Colors.white, size: 16),
+                          ),
+                        ),
+                      // Label at bottom
+                      Positioned(
+                        bottom: 12, left: 12, right: 12,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(style.label, style: const TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 16, color: Colors.white,
+                              shadows: [Shadow(offset: Offset(0, 1), blurRadius: 3, color: Colors.black38)],
+                            )),
+                            const SizedBox(height: 2),
+                            Text(style.desc, style: TextStyle(
+                              fontSize: 11, color: Colors.white.withOpacity(0.85),
+                              shadows: [const Shadow(offset: Offset(0, 1), blurRadius: 2, color: Colors.black26)],
+                            )),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }).toList()),
@@ -644,5 +702,6 @@ class _WeddingStyle {
   final String emoji;
   final String label;
   final String desc;
-  const _WeddingStyle({required this.id, required this.emoji, required this.label, required this.desc});
+  final String image;
+  const _WeddingStyle({required this.id, required this.emoji, required this.label, required this.desc, required this.image});
 }

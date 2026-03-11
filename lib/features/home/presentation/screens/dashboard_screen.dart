@@ -86,7 +86,7 @@ class _WeddingDashboard extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
-          expandedHeight: 180.0, // Reduced height
+          expandedHeight: 260.0,
           floating: false,
           pinned: true,
           backgroundColor: const Color(0xFFD4A574), // Gold fallback
@@ -104,7 +104,7 @@ class _WeddingDashboard extends StatelessWidget {
                   ),
                 ),
                 
-                // Warm overlay instead of black
+                // Light overlay for text readability
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -112,7 +112,7 @@ class _WeddingDashboard extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.black.withOpacity(0.0),
-                        Colors.black.withOpacity(0.3),
+                        Colors.black.withOpacity(0.15),
                       ],
                     ),
                   ),
