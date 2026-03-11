@@ -749,7 +749,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                         context,
                       ).copyWith(dividerColor: Colors.transparent),
                       child: ExpansionTile(
-                        initiallyExpanded: true,
+                        initiallyExpanded: false,
                         tilePadding: const EdgeInsets.symmetric(horizontal: 16),
                         title: Row(
                           children: [
@@ -782,7 +782,13 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                           final actual =
                               (item['actual_cost'] as num?)?.toDouble() ?? 0;
 
-                          return Container(
+                          return GestureDetector(
+                            onTap: () => _showEditItemDialog(
+                              item,
+                              segments,
+                              items,
+                            ),
+                            child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 10,
@@ -915,12 +921,14 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                                 ),
                               ],
                             ),
+                          ),
                           );
                         }).toList(),
                       ),
                     ),
                   );
                 }),
+
               ],
             ),
           );
@@ -930,6 +938,280 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   }
 
   // ── Dialogs ──────────────────────────────────────────────────
+
+  void _showEditItemDialog(
+    Map<String, dynamic> item,
+    List<BudgetSegment> segments,
+    List<Map<String, dynamic>> allItems,
+  ) {
+    final nameCtrl = TextEditingController(text: item['name'] ?? '');
+    final estimatedCtrl = TextEditingController(
+      text: ((item['estimated_cost'] as num?)?.toDouble() ?? 0)
+          .toStringAsFixed(0),
+    );
+    final actualCtrl = TextEditingController(
+      text: ((item['actual_cost'] as num?)?.toDouble() ?? 0)
+          .toStringAsFixed(0),
+    );
+    String segment = (item['segment'] ?? 'couple') as String;
+    String category = (item['category'] ?? '') as String;
+    bool isPaid = item['is_paid'] == true;
+
+    final existingCats =
+        allItems.map((i) => (i['category'] ?? '') as String).toSet().toList()
+          ..sort();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocalState) => Padding(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            MediaQuery.of(ctx).viewInsets.bottom + 20,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Title ──
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Editar gasto',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        _deleteItem(item['id']);
+                        Navigator.pop(ctx);
+                      },
+                      child: Icon(
+                        Icons.delete_outline,
+                        color: AppTheme.error,
+                        size: 22,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // ── Name ──
+                TextField(
+                  controller: nameCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Nombre',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // ── Estimated + Actual side by side ──
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: estimatedCtrl,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Estimado',
+                          suffixText: '\$',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: actualCtrl,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Real',
+                          suffixText: '\$',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // ── Paid toggle ──
+                GestureDetector(
+                  onTap: () => setLocalState(() => isPaid = !isPaid),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isPaid
+                            ? Icons.check_circle
+                            : Icons.circle_outlined,
+                        color: isPaid ? Colors.green : Colors.grey.shade400,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        isPaid ? 'Pagado' : 'No pagado',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: isPaid ? Colors.green : Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // ── Category chips ──
+                Text(
+                  'Categoría',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: existingCats
+                      .where((c) => c.isNotEmpty)
+                      .map(
+                        (c) => GestureDetector(
+                          onTap: () => setLocalState(() => category = c),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: category == c
+                                  ? AppTheme.primary
+                                  : Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              c,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: category == c
+                                    ? Colors.white
+                                    : Colors.grey.shade700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+                const SizedBox(height: 12),
+
+                // ── Segment picker ──
+                Text(
+                  'Pagado por',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: segments
+                      .map(
+                        (s) => GestureDetector(
+                          onTap: () =>
+                              setLocalState(() => segment = s.segmentKey),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: segment == s.segmentKey
+                                  ? AppTheme.primary
+                                  : s.color,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              '${s.emoji} ${s.label}',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                color: segment == s.segmentKey
+                                    ? Colors.white
+                                    : AppTheme.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+                const SizedBox(height: 20),
+
+                // ── Save button ──
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final updates = <String, dynamic>{
+                        'name': nameCtrl.text.trim(),
+                        'estimated_cost':
+                            double.tryParse(estimatedCtrl.text) ?? 0,
+                        'actual_cost': double.tryParse(actualCtrl.text) ?? 0,
+                        'segment': segment,
+                        'category': category,
+                        'is_paid': isPaid,
+                      };
+                      _updateItem(item['id'], updates);
+                      Navigator.pop(ctx);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text('Guardar'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   void _showAddSegmentDialog(String? weddingId) {
     if (weddingId == null) return;

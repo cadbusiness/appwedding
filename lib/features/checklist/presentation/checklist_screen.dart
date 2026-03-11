@@ -473,7 +473,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                         context,
                       ).copyWith(dividerColor: Colors.transparent),
                       child: ExpansionTile(
-                        initiallyExpanded: true,
+                        initiallyExpanded: false,
                         tilePadding: const EdgeInsets.symmetric(horizontal: 16),
                         title: Row(
                           children: [
